@@ -16,10 +16,10 @@ Specific to this experiment: informed traders know the value 50 steps ahead and 
 
 ## Setup
 
-- scenario: `toxic`, config hash `92ddd4ad4197`
-- run id `20261109T213355Z-c3f5f0`, git commit `2c0240941c5c`
+- scenario: `toxic`, config hash `ebc690a89178`
+- run id `20261109T215636Z-a82da5`, git commit `78f2f77fe3a0` (uncommitted changes)
 - root seed 202, 1000 episodes
-- variants tried so far in this repository (lines in `experiments/trial_log.csv`): 84
+- variants tried so far in this repository (lines in `experiments/trial_log.csv`): 116
 - strategy `fixed`, half-spreads `{"half_spread": [0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.75, 1.0, 1.5]}`, informed intensities `{"flow.informed.intensity": [0.0, 20.0, 40.0, 80.0, 120.0, 160.0, 200.0]}`; every cell uses the same seed
 - pre-registered as EXP-002, approved by delegation during an overnight run on 2026-11-09
 
@@ -78,6 +78,49 @@ Confidence intervals, theory values and z-scores for all 70 cells are in `cells.
 | 200 | 0.05 | 15.9 | -76.1 | 2.9 | 189.3 | 100.5 |
 | 200 | 0.5 | 97.6 | -89.6 | 3.2 | 112.2 | 81.2 |
 | 200 | 1.5 | 73.6 | -39.5 | 1.3 | 22.0 | 26.8 |
+
+## Representative grid point in detail: informed intensity 80, half-spread 0.5
+
+Strategy `fixed {"half_spread": 0.5}`, 1000 episodes. One grid point, shown so that the mechanics behind the table above are visible.
+
+### P&L decomposition (mean per episode)
+
+| part | mean | 95% CI |
+|---|---|---|
+| spread capture | 73.111 | [72.728, 73.494] |
+| short-term move after fills (negative = adverse selection) | -35.635 | [-36.629, -34.640] |
+| inventory / holding P&L | 1.483 | [0.224, 2.741] |
+| fees paid (subtracted) | 0.000 | [0.000, 0.000] |
+| **total: mark-to-market P&L** | 38.959 | [37.363, 40.554] |
+
+Decomposition horizon h = 50 steps. Identity check: the largest per-episode error of `spread + short-term + inventory - fees = P&L` is 6.57e-12.
+
+### Markouts by counterparty (mean per fill)
+
+| counterparty | fills | h | markout | 95% CI |
+|---|---|---|---|---|
+| noise | 99952 | 0 | 0.5050 | [0.5049, 0.5050] |
+| noise | 99952 | 1 | 0.5080 | [0.5073, 0.5088] |
+| noise | 99952 | 2 | 0.5115 | [0.5104, 0.5126] |
+| noise | 99952 | 5 | 0.5211 | [0.5194, 0.5228] |
+| noise | 99952 | 10 | 0.5370 | [0.5346, 0.5394] |
+| noise | 99952 | 20 | 0.5673 | [0.5638, 0.5709] |
+| noise | 99952 | 50 | 0.6479 | [0.6418, 0.6541] |
+| informed | 44832 | 0 | 0.5050 | [0.5049, 0.5050] |
+| informed | 44832 | 1 | 0.4781 | [0.4770, 0.4793] |
+| informed | 44832 | 2 | 0.4526 | [0.4509, 0.4543] |
+| informed | 44832 | 5 | 0.3759 | [0.3728, 0.3789] |
+| informed | 44832 | 10 | 0.2508 | [0.2460, 0.2557] |
+| informed | 44832 | 20 | 0.0152 | [0.0075, 0.0229] |
+| informed | 44832 | 50 | -0.6086 | [-0.6238, -0.5934] |
+
+![markout curves](markouts.png)
+
+![terminal inventory](inventory_histogram.png)
+
+![example episode](example_episode.png)
+
+One episode is an illustration, not evidence.
 
 ## Verdict against the pre-registered hypothesis
 

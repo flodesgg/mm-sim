@@ -17,9 +17,9 @@ Specific to this experiment: jumps of size 1 (fixed) arrive at rate 5 per unit t
 ## Setup
 
 - scenario: `jumpy`, config hash `d1c8fe6df97e`
-- run id `20261109T214608Z-0497ff`, git commit `741ba8fd1ee7` (uncommitted changes)
+- run id `20261109T215912Z-134c11`, git commit `78f2f77fe3a0` (uncommitted changes)
 - root seed 404, 1000 episodes
-- variants tried so far in this repository (lines in `experiments/trial_log.csv`): 112
+- variants tried so far in this repository (lines in `experiments/trial_log.csv`): 116
 - strategy `fixed` (half-spread from the config), `{"engine.requote_every": [1.0, 2.0, 3.0, 5.0, 10.0, 20.0]}`; every grid point uses the same seed
 - pre-registered as EXP-004, approved by delegation during an overnight run on 2026-11-09
 
@@ -37,6 +37,42 @@ Specific to this experiment: jumps of size 1 (fixed) arrive at rate 5 per unit t
 A pick-off is a fill on a quote posted at an earlier step that is on the wrong side of the current value (the market maker buys above it or sells below it). `edge per pick-off` is the average edge of those fills at the moment of the fill.
 
 ![mean P&L and pick-offs against requote latency](latency.png)
+
+## Representative grid point in detail: requote every 5 steps
+
+Strategy `fixed {"half_spread": 0.75}`, 1000 episodes. One grid point, shown so that the mechanics behind the table above are visible.
+
+### P&L decomposition (mean per episode)
+
+| part | mean | 95% CI |
+|---|---|---|
+| spread capture | 54.380 | [53.989, 54.772] |
+| short-term move after fills (negative = adverse selection) | 0.016 | [-0.342, 0.373] |
+| inventory / holding P&L | 0.301 | [-0.810, 1.412] |
+| fees paid (subtracted) | 0.000 | [0.000, 0.000] |
+| **total: mark-to-market P&L** | 54.697 | [53.467, 55.927] |
+
+Decomposition horizon h = 10 steps. Identity check: the largest per-episode error of `spread + short-term + inventory - fees = P&L` is 2.07e-12.
+
+### Markouts by counterparty (mean per fill)
+
+| counterparty | fills | h | markout | 95% CI |
+|---|---|---|---|---|
+| noise | 85382 | 0 | 0.6369 | [0.6339, 0.6399] |
+| noise | 85382 | 1 | 0.6366 | [0.6333, 0.6399] |
+| noise | 85382 | 2 | 0.6362 | [0.6327, 0.6398] |
+| noise | 85382 | 5 | 0.6377 | [0.6336, 0.6417] |
+| noise | 85382 | 10 | 0.6371 | [0.6321, 0.6421] |
+| noise | 85382 | 20 | 0.6353 | [0.6290, 0.6416] |
+| noise | 85382 | 50 | 0.6368 | [0.6273, 0.6462] |
+
+![markout curves](markouts.png)
+
+![terminal inventory](inventory_histogram.png)
+
+![example episode](example_episode.png)
+
+One episode is an illustration, not evidence.
 
 ## Verdict against the pre-registered hypothesis
 

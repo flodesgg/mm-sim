@@ -17,9 +17,9 @@ Specific to this experiment: noise traders only (no informed flow, no jumps). Th
 ## Setup
 
 - scenario: `inventory`, config hash `462cf8b0d9ce`
-- run id `20261109T214532Z-6561a4`, git commit `741ba8fd1ee7`
+- run id `20261109T215838Z-3abba1`, git commit `78f2f77fe3a0` (uncommitted changes)
 - root seed 303, 1000 episodes
-- variants tried so far in this repository (lines in `experiments/trial_log.csv`): 106
+- variants tried so far in this repository (lines in `experiments/trial_log.csv`): 116
 - grids `{"gamma": [0.01, 0.05, 0.1, 0.2, 0.5, 1.0], "kappa": [0.01, 0.02, 0.05, 0.1, 0.2]}`; each variant is paired with `fixed` at half its average quoted spread, on the same seed (common random numbers)
 - pre-registered as EXP-003, approved by delegation during an overnight run on 2026-11-09
 - certainty equivalent with risk aversion 0.1; std-ratio and CE intervals by paired bootstrap over episodes (2000 resamples)
@@ -63,6 +63,42 @@ The difference between mark-to-market and liquidated P&L is the cost of closing 
 ![risk-return frontier](frontier.png)
 
 ![terminal inventory](terminal_inventory.png)
+
+## Representative grid point in detail: avellaneda_stoikov gamma=0.1
+
+Strategy `avellaneda_stoikov {"gamma": 0.1}`, 1000 episodes. One grid point, shown so that the mechanics behind the table above are visible.
+
+### P&L decomposition (mean per episode)
+
+| part | mean | 95% CI |
+|---|---|---|
+| spread capture | 57.207 | [56.863, 57.552] |
+| short-term move after fills (negative = adverse selection) | -0.027 | [-0.203, 0.149] |
+| inventory / holding P&L | -0.025 | [-0.190, 0.140] |
+| fees paid (subtracted) | 0.000 | [0.000, 0.000] |
+| **total: mark-to-market P&L** | 57.156 | [56.768, 57.544] |
+
+Decomposition horizon h = 10 steps. Identity check: the largest per-episode error of `spread + short-term + inventory - fees = P&L` is 2.84e-13.
+
+### Markouts by counterparty (mean per fill)
+
+| counterparty | fills | h | markout | 95% CI |
+|---|---|---|---|---|
+| noise | 84968 | 0 | 0.6733 | [0.6729, 0.6737] |
+| noise | 84968 | 1 | 0.6737 | [0.6728, 0.6747] |
+| noise | 84968 | 2 | 0.6731 | [0.6718, 0.6743] |
+| noise | 84968 | 5 | 0.6724 | [0.6707, 0.6741] |
+| noise | 84968 | 10 | 0.6730 | [0.6709, 0.6751] |
+| noise | 84968 | 20 | 0.6736 | [0.6711, 0.6760] |
+| noise | 84968 | 50 | 0.6732 | [0.6707, 0.6758] |
+
+![markout curves](markouts.png)
+
+![terminal inventory](inventory_histogram.png)
+
+![example episode](example_episode.png)
+
+One episode is an illustration, not evidence.
 
 ## Verdict against the pre-registered hypothesis
 

@@ -16,5 +16,56 @@
     "H2 AS gamma = 0.1 cuts the std by at least 25% (ratio CI below 0.75)": true,
     "H3 AS gamma = 0.1 costs at most 15% of the benchmark's mean liquidated P&L (paired CI)": true,
     "H4 AS gamma = 0.1 has a higher certainty equivalent than its benchmark (difference CI above 0)": true
+  },
+  "original_run": {
+    "run_id": "20261109T214532Z-6561a4",
+    "started_utc": "2026-11-09T21:45:32+00:00",
+    "git_commit": "741ba8fd1ee7",
+    "git_dirty": false,
+    "config_hash": "462cf8b0d9ce",
+    "scenario": "inventory"
+  },
+  "reproduction": {
+    "run": {
+      "run_id": "20261109T215838Z-3abba1",
+      "started_utc": "2026-11-09T21:58:38+00:00",
+      "git_commit": "78f2f77fe3a0",
+      "git_dirty": true,
+      "config_hash": "462cf8b0d9ce",
+      "scenario": "inventory"
+    },
+    "pinned_config_hash": "462cf8b0d9ce",
+    "columns_compared": [
+      "strategy",
+      "parameter",
+      "value",
+      "mean_quoted_spread",
+      "benchmark_quoted_spread",
+      "mean",
+      "ci_low",
+      "ci_high",
+      "std",
+      "bench_mean",
+      "bench_ci_low",
+      "bench_ci_high",
+      "bench_std",
+      "mean_diff",
+      "mean_diff_ci_low",
+      "mean_diff_ci_high",
+      "paired_ci_width_ratio",
+      "std_ratio",
+      "std_ratio_ci_low",
+      "std_ratio_ci_high",
+      "ce",
+      "bench_ce",
+      "ce_diff_ci_low",
+      "ce_diff_ci_high",
+      "mean_mtm",
+      "bench_mean_mtm",
+      "terminal_q_std",
+      "bench_terminal_q_std",
+      "share_at_limit"
+    ],
+    "largest_relative_difference": 0.0
   }
 }

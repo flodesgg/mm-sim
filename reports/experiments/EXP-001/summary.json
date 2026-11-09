@@ -17,5 +17,42 @@
     "C3a std within 10% of theory at every grid point": true,
     "C3b std at the widest half-spread is below std at the narrowest": true
   },
-  "optimal_half_spread_theory": 0.7486745106189073
+  "optimal_half_spread_theory": 0.7486745106189073,
+  "original_run": {
+    "run_id": "20261109T212048Z-f0ee9c",
+    "started_utc": "2026-11-09T21:20:48+00:00",
+    "git_commit": "6c91285cc39c",
+    "git_dirty": false,
+    "config_hash": "98f30782c37f",
+    "scenario": "baseline"
+  },
+  "reproduction": {
+    "run": {
+      "run_id": "20261109T215620Z-265f81",
+      "started_utc": "2026-11-09T21:56:20+00:00",
+      "git_commit": "78f2f77fe3a0",
+      "git_dirty": false,
+      "config_hash": "fbe6c4ea5f6c",
+      "scenario": "baseline"
+    },
+    "pinned_config_hash": "98f30782c37f",
+    "columns_compared": [
+      "half_spread",
+      "mean_pnl",
+      "ci_low",
+      "ci_high",
+      "se",
+      "theory_mean",
+      "theory_mean_no_tick",
+      "z_mean",
+      "z_paired",
+      "std_pnl",
+      "theory_std",
+      "std_ratio",
+      "fills_per_episode",
+      "theory_fills",
+      "share_at_limit"
+    ],
+    "largest_relative_difference": 0.0
+  }
 }
