@@ -26,6 +26,7 @@ from mm_sim.analysis.trials import append_trial, count_trials
 from mm_sim.config import Config
 from mm_sim.reports.common import LIMITATIONS, fmt, setup_lines
 from mm_sim.reports.figures import DPI
+from mm_sim.reports.sections import Representative, with_representative
 from mm_sim.runinfo import RunInfo
 from mm_sim.strategies.base import build_strategy
 
@@ -33,16 +34,26 @@ Z_LIMIT = 3.5  # |simulated mean - theory| / standard error allowed at every gri
 STD_TOLERANCE = 0.10  # simulated std / theory std must be within 1 +- this
 
 
-def sweep(cfg: Config, exp: Experiment, info: RunInfo) -> pd.DataFrame:
-    """One row per half-spread. Appends one trial-log line per grid point."""
+TABLE_FILE = "sweep.csv"
+
+
+def sweep(
+    cfg: Config, exp: Experiment, info: RunInfo, log: bool = True
+) -> tuple[pd.DataFrame, Representative]:
+    """One row per half-spread. Appends one trial-log line per grid point (unless this is a
+    reproduction of a run already logged). The representative grid point is the one where the
+    theory's mean P&L is highest."""
     level = cfg.analysis.ci_level
     rows = []
+    rep: Representative | None = None
+    best_theory = -float("inf")
     for h in exp.grid["half_spread"]:
         strategy, params = build_strategy(cfg, exp.strategy, {"half_spread": h})
         ep = run_monte_carlo(cfg, strategy)
-        append_trial(
-            cfg.paths.experiments, info, exp.id, exp.strategy, params, exp.seed, exp.episodes
-        )
+        if log:
+            append_trial(
+                cfg.paths.experiments, info, exp.id, exp.strategy, params, exp.seed, exp.episodes
+            )
         pnl = ep["pnl_mtm"]
         mean, lo, hi = mean_ci(pnl, level)
         se = float(pnl.std(ddof=1)) / np.sqrt(len(pnl))
@@ -50,6 +61,9 @@ def sweep(cfg: Config, exp: Experiment, info: RunInfo) -> pd.DataFrame:
         diff = pnl - ep["noise_capture_expected"]
         theory_mean = theory.fixed_noise_mean_pnl(cfg, h)
         theory_std = theory.fixed_noise_pnl_std(cfg, h)
+        if theory_mean > best_theory:
+            best_theory = theory_mean
+            rep = Representative(cfg, exp.strategy, params, ep, f"half-spread {h:g}")
         rows.append(
             {
                 "half_spread": h,
@@ -66,10 +80,15 @@ def sweep(cfg: Config, exp: Experiment, info: RunInfo) -> pd.DataFrame:
                 "std_ratio": float(pnl.std(ddof=1)) / theory_std,
                 "fills_per_episode": float(ep["volume"].mean()),
                 "theory_fills": 2 * cfg.market.n_steps * theory.fill_probability_per_side(cfg, h),
+                "spread_capture": float(ep["spread_capture"].mean()),
+                "adverse_selection": float(ep["adverse_selection"].mean()),
+                "inventory_pnl": float(ep["inventory_pnl"].mean()),
+                "fees": float(ep["fees"].mean()),
                 "share_at_limit": float(ep["share_at_limit"].mean()),
             }
         )
-    return pd.DataFrame(rows)
+    assert rep is not None
+    return pd.DataFrame(rows), rep
 
 
 def verdict(table: pd.DataFrame) -> tuple[str, dict[str, bool]]:
@@ -204,11 +223,11 @@ def _report_md(
     return "\n".join(lines)
 
 
-def run(cfg: Config, exp: Experiment, info: RunInfo, out_dir: Path) -> str:
+def run(cfg: Config, exp: Experiment, info: RunInfo, out_dir: Path, log: bool = True) -> str:
     out_dir.mkdir(parents=True, exist_ok=False)  # an existing directory means it already ran
-    table = sweep(cfg, exp, info)
+    table, rep = sweep(cfg, exp, info, log)
     decision, checks = verdict(table)
-    table.to_csv(out_dir / "sweep.csv", index=False, float_format="%.10g")
+    table.to_csv(out_dir / TABLE_FILE, index=False, float_format="%.10g")
     summary = {
         "run": info.as_dict(),
         "experiment": exp.id,
@@ -221,5 +240,6 @@ def run(cfg: Config, exp: Experiment, info: RunInfo, out_dir: Path) -> str:
     (out_dir / "summary.json").write_text(json.dumps(summary, indent=2) + "\n")
     _figure(cfg, table, out_dir / "pnl_vs_half_spread.png")
     trials = count_trials(cfg.paths.experiments)
-    (out_dir / "report.md").write_text(_report_md(cfg, exp, info, table, decision, checks, trials))
+    report = _report_md(cfg, exp, info, table, decision, checks, trials)
+    (out_dir / "report.md").write_text(with_representative(report, rep, out_dir))
     return decision

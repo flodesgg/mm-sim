@@ -5,21 +5,34 @@ Commands
   run --scenario X --strategy S [--episodes N] [--seed K]
                                 Monte Carlo run -> reports/runs/<run_id>/
   experiment EXP-NNN            run an approved, pre-registered experiment (once)
+  reproduce EXP-NNN             rebuild a finished experiment's report and figures from
+                                scratch and verify the numbers against the stored ones
 """
 
 from __future__ import annotations
 
 import argparse
 import json
+import shutil
 import sys
 from pathlib import Path
+from types import ModuleType
 
+import numpy as np
+import pandas as pd
 import yaml
 from pydantic import ValidationError
 
 from mm_sim import __version__
-from mm_sim.analysis import exp_fixed_spread, exp_frontier, exp_heatmap, exp_latency
+from mm_sim.analysis import (
+    exp_fixed_spread,
+    exp_frontier,
+    exp_heatmap,
+    exp_latency,
+    exp_robustness,
+)
 from mm_sim.analysis.experiment import (
+    Experiment,
     ExperimentError,
     check_runnable,
     find_experiment,
@@ -33,12 +46,13 @@ from mm_sim.reports.run_report import write_run
 from mm_sim.runinfo import RunInfo, new_run_info
 from mm_sim.strategies import REGISTRY, build_strategy
 
-# experiment kind -> function(cfg, experiment, run info, output directory) -> decision
-EXPERIMENT_KINDS = {
-    "fixed_spread_sweep": exp_fixed_spread.run,
-    "spread_intensity_heatmap": exp_heatmap.run,
-    "inventory_frontier": exp_frontier.run,
-    "latency_sweep": exp_latency.run,
+# experiment kind -> module with run(cfg, experiment, run info, output dir, log) and TABLE_FILE
+EXPERIMENT_KINDS: dict[str, ModuleType] = {
+    "fixed_spread_sweep": exp_fixed_spread,
+    "spread_intensity_heatmap": exp_heatmap,
+    "inventory_frontier": exp_frontier,
+    "latency_sweep": exp_latency,
+    "robustness": exp_robustness,
 }
 
 
@@ -82,21 +96,76 @@ def cmd_run(args: argparse.Namespace) -> int:
     return 0
 
 
-def cmd_experiment(args: argparse.Namespace) -> int:
+def _experiment_setup(
+    args: argparse.Namespace,
+) -> tuple[Config, RunInfo, Experiment, ModuleType, Path]:
     base, _ = load_config(args.config)
     exp = load_experiment(find_experiment(base.paths.experiments, args.id))
     cfg, info = _start(args, scenario=exp.scenario)
-    check_runnable(exp, info.config_hash)
     if exp.kind not in EXPERIMENT_KINDS:
         raise ExperimentError(f"unknown experiment kind {exp.kind!r}")
     cfg = with_run_settings(cfg, exp.seed, exp.episodes)
-    out_dir = cfg.paths.reports / "experiments" / exp.id
+    return cfg, info, exp, EXPERIMENT_KINDS[exp.kind], cfg.paths.reports / "experiments" / exp.id
+
+
+def cmd_experiment(args: argparse.Namespace) -> int:
+    cfg, info, exp, kind, out_dir = _experiment_setup(args)
+    check_runnable(exp, info.config_hash)
     if out_dir.exists():
         raise ExperimentError(f"{out_dir} exists: {exp.id} has already run")
-    decision = EXPERIMENT_KINDS[exp.kind](cfg, exp, info, out_dir)
+    decision = kind.run(cfg, exp, info, out_dir)
     print(f"{exp.id}: {decision}")
     print(f"report: {out_dir / 'report.md'}")
     print("Now record the result and the decision in the experiment file and set status: done.")
+    return 0
+
+
+def cmd_reproduce(args: argparse.Namespace) -> int:
+    """Rebuild a finished experiment's report and figures from scratch and check that the
+    numbers are the stored ones. Same seed, same grid: a reproduction, not a new trial, so
+    nothing is added to the trial log."""
+    cfg, info, exp, kind, out_dir = _experiment_setup(args)
+    if exp.status != "done" or not out_dir.is_dir():
+        raise ExperimentError(f"{exp.id} has not run yet; `reproduce` is for finished experiments")
+    stored = pd.read_csv(out_dir / kind.TABLE_FILE)
+    old_summary = json.loads((out_dir / "summary.json").read_text())
+    scratch = out_dir.with_name(f"{exp.id}.reproduce")
+    if scratch.exists():
+        shutil.rmtree(scratch)
+    decision = kind.run(cfg, exp, info, scratch, log=False)
+    fresh = pd.read_csv(scratch / kind.TABLE_FILE)
+    shared = [c for c in stored.columns if c in fresh.columns]
+    numeric = [c for c in shared if pd.api.types.is_numeric_dtype(stored[c])]
+    same = len(stored) == len(fresh) and all(
+        stored[c].equals(fresh[c]) for c in shared if c not in numeric
+    )
+    worst = 0.0
+    if same and numeric:
+        a, b = stored[numeric].to_numpy(dtype=float), fresh[numeric].to_numpy(dtype=float)
+        worst = float(np.nanmax(np.abs(a - b) / (1e-9 + np.abs(a))))
+        same = bool(np.array_equal(np.isnan(a), np.isnan(b)) and worst <= 1e-8)
+    if not same or decision != exp.decision:
+        shutil.rmtree(scratch)
+        print(
+            f"error: {exp.id} did NOT reproduce (largest relative difference {worst:.2e}, "
+            f"decision {decision} vs recorded {exp.decision}). The stored report is unchanged.",
+            file=sys.stderr,
+        )
+        return 1
+    summary = json.loads((scratch / "summary.json").read_text())
+    summary["original_run"] = old_summary.get("original_run", old_summary["run"])
+    summary["reproduction"] = {
+        "run": info.as_dict(),
+        "pinned_config_hash": exp.config_hash,
+        "columns_compared": shared,
+        "largest_relative_difference": worst,
+    }
+    summary["run"] = summary["original_run"]
+    (scratch / "summary.json").write_text(json.dumps(summary, indent=2) + "\n")
+    shutil.rmtree(out_dir)
+    scratch.rename(out_dir)
+    print(f"{exp.id}: reproduced ({len(shared)} columns, largest relative difference {worst:.1e})")
+    print(f"report: {out_dir / 'report.md'}")
     return 0
 
 
@@ -124,6 +193,11 @@ def build_parser() -> argparse.ArgumentParser:
     p_exp.add_argument("id", help="for example EXP-001")
     p_exp.add_argument("--config", type=Path, default=DEFAULT_CONFIG_PATH)
     p_exp.set_defaults(func=cmd_experiment)
+
+    p_rep = sub.add_parser("reproduce", help="rebuild a finished experiment and verify it")
+    p_rep.add_argument("id", help="for example EXP-001")
+    p_rep.add_argument("--config", type=Path, default=DEFAULT_CONFIG_PATH)
+    p_rep.set_defaults(func=cmd_reproduce)
     return parser
 
 

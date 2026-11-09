@@ -32,6 +32,7 @@ from mm_sim.analysis.trials import append_trial, count_trials
 from mm_sim.config import Config
 from mm_sim.reports.common import LIMITATIONS, fmt, setup_lines
 from mm_sim.reports.figures import DPI
+from mm_sim.reports.sections import Representative, with_representative
 from mm_sim.runinfo import RunInfo
 from mm_sim.strategies.base import build_strategy
 
@@ -44,17 +45,30 @@ RISK_GRID = {"avellaneda_stoikov": 0.1, "skew": 0.05}  # H1 applies from these v
 BOOTSTRAP_SEED = 20261109
 
 
+TABLE_FILE = "frontier.csv"
+
+
 def _one(
-    cfg: Config, exp: Experiment, info: RunInfo, strategy: str, param: str, value: float
-) -> tuple[dict[str, object], np.ndarray, np.ndarray]:
+    cfg: Config,
+    exp: Experiment,
+    info: RunInfo,
+    strategy: str,
+    param: str,
+    value: float,
+    log: bool,
+) -> tuple[dict[str, object], pd.DataFrame, pd.DataFrame, dict[str, object]]:
     level, gamma = cfg.analysis.ci_level, cfg.analysis.cara_gamma
     variant, v_params = build_strategy(cfg, strategy, {param: value})
     ep_v = run_monte_carlo(cfg, variant)
-    append_trial(cfg.paths.experiments, info, exp.id, strategy, v_params, exp.seed, exp.episodes)
+    if log:
+        append_trial(
+            cfg.paths.experiments, info, exp.id, strategy, v_params, exp.seed, exp.episodes
+        )
     spread = float(ep_v["mean_quoted_spread"].mean())
     bench, b_params = build_strategy(cfg, "fixed", {"half_spread": spread / 2})
     ep_b = run_monte_carlo(cfg, bench)
-    append_trial(cfg.paths.experiments, info, exp.id, "fixed", b_params, exp.seed, exp.episodes)
+    if log:
+        append_trial(cfg.paths.experiments, info, exp.id, "fixed", b_params, exp.seed, exp.episodes)
 
     v, b = ep_v["pnl_liquidated"].to_numpy(), ep_b["pnl_liquidated"].to_numpy()
     mean_v, lo_v, hi_v = mean_ci(v, level)
@@ -100,22 +114,36 @@ def _one(
         "bench_mean_mtm": float(ep_b["pnl_mtm"].mean()),
         "terminal_q_std": float(ep_v["terminal_q"].std(ddof=1)),
         "bench_terminal_q_std": float(ep_b["terminal_q"].std(ddof=1)),
+        "spread_capture": float(ep_v["spread_capture"].mean()),
+        "adverse_selection": float(ep_v["adverse_selection"].mean()),
+        "inventory_pnl": float(ep_v["inventory_pnl"].mean()),
+        "fees": float(ep_v["fees"].mean()),
         "share_at_limit": float(ep_v["share_at_limit"].mean()),
     }
-    return row, ep_v["terminal_q"].to_numpy(), ep_b["terminal_q"].to_numpy()
+    return row, ep_v, ep_b, v_params
 
 
 def sweep(
-    cfg: Config, exp: Experiment, info: RunInfo
-) -> tuple[pd.DataFrame, dict[tuple[str, float], tuple[np.ndarray, np.ndarray]]]:
+    cfg: Config, exp: Experiment, info: RunInfo, log: bool = True
+) -> tuple[pd.DataFrame, dict[tuple[str, float], tuple[np.ndarray, np.ndarray]], Representative]:
+    """One row per variant, paired with its benchmark. The representative grid point is the
+    primary variant (Avellaneda-Stoikov, gamma = 0.1)."""
     rows, inventories = [], {}
+    rep: Representative | None = None
     for key, values in exp.grid.items():
         strategy, param = VARIANTS[key]
         for value in values:
-            row, q_v, q_b = _one(cfg, exp, info, strategy, param, value)
+            row, ep_v, ep_b, params = _one(cfg, exp, info, strategy, param, value, log)
             rows.append(row)
-            inventories[(strategy, value)] = (q_v, q_b)
-    return pd.DataFrame(rows), inventories
+            inventories[(strategy, value)] = (
+                ep_v["terminal_q"].to_numpy(),
+                ep_b["terminal_q"].to_numpy(),
+            )
+            if strategy == PRIMARY[0] and np.isclose(value, PRIMARY[1]):
+                rep = Representative(cfg, strategy, params, ep_v, f"{strategy} {param}={value:g}")
+    if rep is None:
+        raise ValueError("the grid must contain avellaneda_stoikov gamma = 0.1")
+    return pd.DataFrame(rows), inventories, rep
 
 
 def verdict(table: pd.DataFrame) -> tuple[str, dict[str, bool]]:
@@ -314,11 +342,11 @@ def _report_md(
     return "\n".join(lines)
 
 
-def run(cfg: Config, exp: Experiment, info: RunInfo, out_dir: Path) -> str:
+def run(cfg: Config, exp: Experiment, info: RunInfo, out_dir: Path, log: bool = True) -> str:
     out_dir.mkdir(parents=True, exist_ok=False)  # an existing directory means it already ran
-    table, inventories = sweep(cfg, exp, info)
+    table, inventories, rep = sweep(cfg, exp, info, log)
     decision, checks = verdict(table)
-    table.to_csv(out_dir / "frontier.csv", index=False, float_format="%.10g")
+    table.to_csv(out_dir / TABLE_FILE, index=False, float_format="%.10g")
     summary = {
         "run": info.as_dict(),
         "experiment": exp.id,
@@ -331,5 +359,6 @@ def run(cfg: Config, exp: Experiment, info: RunInfo, out_dir: Path) -> str:
     _frontier_figure(table, out_dir / "frontier.png")
     _inventory_figure(inventories, out_dir / "terminal_inventory.png")
     trials = count_trials(cfg.paths.experiments)
-    (out_dir / "report.md").write_text(_report_md(cfg, exp, info, table, decision, checks, trials))
+    report = _report_md(cfg, exp, info, table, decision, checks, trials)
+    (out_dir / "report.md").write_text(with_representative(report, rep, out_dir))
     return decision

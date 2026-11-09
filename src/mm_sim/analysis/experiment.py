@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from datetime import date
 from pathlib import Path
-from typing import Literal
+from typing import Any, Literal
 
 import yaml
 from pydantic import Field
@@ -37,6 +37,7 @@ class Experiment(StrictModel):
     config_grid: dict[str, list[float]] = Field(default_factory=dict)
     seed: int = Field(ge=0)
     episodes: int = Field(ge=1)
+    settings: dict[str, Any] = Field(default_factory=dict)  # kind-specific settings
 
 
 def load_experiment(path: Path) -> Experiment:

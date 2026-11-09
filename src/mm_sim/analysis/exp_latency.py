@@ -25,6 +25,7 @@ from mm_sim.analysis.trials import append_trial, count_trials
 from mm_sim.config import Config, with_overrides
 from mm_sim.reports.common import LIMITATIONS, fmt, setup_lines
 from mm_sim.reports.figures import DPI
+from mm_sim.reports.sections import Representative, with_representative
 from mm_sim.runinfo import RunInfo
 from mm_sim.strategies.base import build_strategy
 
@@ -36,24 +37,36 @@ def _se(x: pd.Series) -> float:
     return float(x.std(ddof=1)) / float(np.sqrt(len(x)))
 
 
-def sweep(cfg: Config, exp: Experiment, info: RunInfo) -> pd.DataFrame:
+TABLE_FILE = "latency.csv"
+
+
+def sweep(
+    cfg: Config, exp: Experiment, info: RunInfo, log: bool = True
+) -> tuple[pd.DataFrame, Representative]:
+    """One row per requote interval. The representative grid point is the middle one."""
     level = cfg.analysis.ci_level
     rows = []
+    rep: Representative | None = None
+    grid = exp.config_grid[REQUOTE_KEY]
+    middle = int(grid[len(grid) // 2])
     for raw in exp.config_grid[REQUOTE_KEY]:
         every = int(raw)
         c = with_overrides(cfg, {REQUOTE_KEY: every})
         strategy, params = build_strategy(c, exp.strategy)
         h = float(params["half_spread"])  # type: ignore[arg-type]
         ep = run_monte_carlo(c, strategy)
-        append_trial(
-            cfg.paths.experiments,
-            info,
-            exp.id,
-            exp.strategy,
-            {**params, REQUOTE_KEY: every},
-            exp.seed,
-            exp.episodes,
-        )
+        if log:
+            append_trial(
+                cfg.paths.experiments,
+                info,
+                exp.id,
+                exp.strategy,
+                {**params, REQUOTE_KEY: every},
+                exp.seed,
+                exp.episodes,
+            )
+        if every == middle:
+            rep = Representative(c, exp.strategy, params, ep, f"requote every {every} steps")
         pnl, picks = ep["pnl_mtm"], ep["picked_off"]
         mean, lo, hi = mean_ci(pnl, level)
         p_mean, p_lo, p_hi = mean_ci(picks, level)
@@ -79,10 +92,14 @@ def sweep(cfg: Config, exp: Experiment, info: RunInfo) -> pd.DataFrame:
                 "edge_ci_high": edge_hi,
                 "fills": float(ep["volume"].mean()),
                 "spread_capture": float(ep["spread_capture"].mean()),
+                "adverse_selection": float(ep["adverse_selection"].mean()),
+                "inventory_pnl": float(ep["inventory_pnl"].mean()),
+                "fees": float(ep["fees"].mean()),
                 "share_at_limit": float(ep["share_at_limit"].mean()),
             }
         )
-    return pd.DataFrame(rows)
+    assert rep is not None
+    return pd.DataFrame(rows), rep
 
 
 def verdict(table: pd.DataFrame) -> tuple[str, dict[str, bool]]:
@@ -232,11 +249,11 @@ def _report_md(
     return "\n".join(lines)
 
 
-def run(cfg: Config, exp: Experiment, info: RunInfo, out_dir: Path) -> str:
+def run(cfg: Config, exp: Experiment, info: RunInfo, out_dir: Path, log: bool = True) -> str:
     out_dir.mkdir(parents=True, exist_ok=False)  # an existing directory means it already ran
-    table = sweep(cfg, exp, info)
+    table, rep = sweep(cfg, exp, info, log)
     decision, checks = verdict(table)
-    table.to_csv(out_dir / "latency.csv", index=False, float_format="%.10g")
+    table.to_csv(out_dir / TABLE_FILE, index=False, float_format="%.10g")
     summary = {
         "run": info.as_dict(),
         "experiment": exp.id,
@@ -248,5 +265,6 @@ def run(cfg: Config, exp: Experiment, info: RunInfo, out_dir: Path) -> str:
     (out_dir / "summary.json").write_text(json.dumps(summary, indent=2) + "\n")
     _figure(table, out_dir / "latency.png")
     trials = count_trials(cfg.paths.experiments)
-    (out_dir / "report.md").write_text(_report_md(cfg, exp, info, table, decision, checks, trials))
+    report = _report_md(cfg, exp, info, table, decision, checks, trials)
+    (out_dir / "report.md").write_text(with_representative(report, rep, out_dir))
     return decision

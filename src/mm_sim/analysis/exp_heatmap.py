@@ -27,6 +27,7 @@ from mm_sim.analysis.trials import append_trial, count_trials
 from mm_sim.config import Config, with_overrides
 from mm_sim.reports.common import LIMITATIONS, fmt, setup_lines
 from mm_sim.reports.figures import DPI
+from mm_sim.reports.sections import Representative, with_representative
 from mm_sim.runinfo import RunInfo
 from mm_sim.strategies.base import build_strategy
 
@@ -35,23 +36,36 @@ Z_LIMIT = 4.0  # |simulated mean - theory| / standard error allowed in every cel
 BREAK_EVEN_TOLERANCE = 0.05  # |simulated - theoretical break-even half-spread| allowed
 
 
-def sweep(cfg: Config, exp: Experiment, info: RunInfo) -> pd.DataFrame:
-    """One row per (informed intensity, half-spread). One trial-log line per cell."""
+TABLE_FILE = "cells.csv"
+
+
+def sweep(
+    cfg: Config, exp: Experiment, info: RunInfo, log: bool = True
+) -> tuple[pd.DataFrame, Representative]:
+    """One row per (informed intensity, half-spread). One trial-log line per cell (unless
+    this is a reproduction). The representative cell is the middle of both grids."""
     rows = []
+    rep: Representative | None = None
+    lams, hs = exp.config_grid[INTENSITY_KEY], exp.grid["half_spread"]
+    middle = (lams[len(lams) // 2], hs[len(hs) // 2])
     for lam in exp.config_grid[INTENSITY_KEY]:
         cell_cfg = with_overrides(cfg, {INTENSITY_KEY: lam})
         for h in exp.grid["half_spread"]:
             strategy, params = build_strategy(cell_cfg, exp.strategy, {"half_spread": h})
             ep = run_monte_carlo(cell_cfg, strategy)
-            append_trial(
-                cfg.paths.experiments,
-                info,
-                exp.id,
-                exp.strategy,
-                {**params, INTENSITY_KEY: lam},
-                exp.seed,
-                exp.episodes,
-            )
+            if log:
+                append_trial(
+                    cfg.paths.experiments,
+                    info,
+                    exp.id,
+                    exp.strategy,
+                    {**params, INTENSITY_KEY: lam},
+                    exp.seed,
+                    exp.episodes,
+                )
+            if (lam, h) == middle:
+                label = f"informed intensity {lam:g}, half-spread {h:g}"
+                rep = Representative(cell_cfg, exp.strategy, params, ep, label)
             pnl = ep["pnl_mtm"]
             mean, lo, hi = mean_ci(pnl, cfg.analysis.ci_level)
             se = float(pnl.std(ddof=1)) / np.sqrt(len(pnl))
@@ -71,10 +85,12 @@ def sweep(cfg: Config, exp: Experiment, info: RunInfo) -> pd.DataFrame:
                     "inventory_pnl": float(ep["inventory_pnl"].mean()),
                     "fills_noise": float(ep["fills_noise"].mean()),
                     "fills_informed": float(ep["fills_informed"].mean()),
+                    "fees": float(ep["fees"].mean()),
                     "share_at_limit": float(ep["share_at_limit"].mean()),
                 }
             )
-    return pd.DataFrame(rows)
+    assert rep is not None
+    return pd.DataFrame(rows), rep
 
 
 def simulated_break_even(h: np.ndarray, mean: np.ndarray) -> float:
@@ -279,12 +295,12 @@ def _report_md(
     return "\n".join(lines)
 
 
-def run(cfg: Config, exp: Experiment, info: RunInfo, out_dir: Path) -> str:
+def run(cfg: Config, exp: Experiment, info: RunInfo, out_dir: Path, log: bool = True) -> str:
     out_dir.mkdir(parents=True, exist_ok=False)  # an existing directory means it already ran
-    table = sweep(cfg, exp, info)
+    table, rep = sweep(cfg, exp, info, log)
     be = break_even_table(cfg, table)
     decision, checks, flags = verdict(table, be)
-    table.to_csv(out_dir / "cells.csv", index=False, float_format="%.10g")
+    table.to_csv(out_dir / TABLE_FILE, index=False, float_format="%.10g")
     be.to_csv(out_dir / "break_even.csv", index=False, float_format="%.10g")
     summary = {
         "run": info.as_dict(),
@@ -298,7 +314,6 @@ def run(cfg: Config, exp: Experiment, info: RunInfo, out_dir: Path) -> str:
     (out_dir / "summary.json").write_text(json.dumps(summary, indent=2) + "\n")
     _figure(cfg, table, be, out_dir / "heatmap.png")
     trials = count_trials(cfg.paths.experiments)
-    (out_dir / "report.md").write_text(
-        _report_md(cfg, exp, info, table, be, decision, checks, flags, trials)
-    )
+    report = _report_md(cfg, exp, info, table, be, decision, checks, flags, trials)
+    (out_dir / "report.md").write_text(with_representative(report, rep, out_dir))
     return decision

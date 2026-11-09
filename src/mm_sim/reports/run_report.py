@@ -1,4 +1,8 @@
-"""Output of `mm-sim run`: summary.json, episodes.csv, report.md and one example figure."""
+"""Output of `mm-sim run`: summary.json, episodes.csv, report.md and figures.
+
+Report order: limitations, setup, results with CIs, P&L decomposition, markouts, sanity
+checks (SUSPICIOUS flags), activity, figures.
+"""
 
 from __future__ import annotations
 
@@ -9,26 +13,40 @@ import pandas as pd
 
 from mm_sim.analysis.markouts import markout_curve
 from mm_sim.analysis.stats import mean_ci, summarize
+from mm_sim.analysis.suspicious import Check, run_checks
 from mm_sim.config import Config
 from mm_sim.engine.reference import simulate_episode
 from mm_sim.reports.common import LIMITATIONS, fmt, setup_lines
 from mm_sim.reports.figures import example_episode_figure, markout_figure
+from mm_sim.reports.sections import (
+    decomposition_error,
+    decomposition_lines,
+    inventory_figure,
+    markout_lines,
+)
 from mm_sim.runinfo import RunInfo
 from mm_sim.strategies.base import Strategy
 
-IDENTITY_TOLERANCE = 1e-9
-_PARTS = ("spread_capture", "adverse_selection", "inventory_pnl", "fees", "pnl_mtm")
-_ACTIVITY = ("buys", "sells", "volume", "max_abs_q", "mean_abs_q", "terminal_q", "share_at_limit")
-
-
-def decomposition_error(episodes: pd.DataFrame) -> float:
-    """Largest |spread + adverse + inventory - fees - P&L| over the episodes."""
-    parts = episodes["spread_capture"] + episodes["adverse_selection"] + episodes["inventory_pnl"]
-    return float((parts - episodes["fees"] - episodes["pnl_mtm"]).abs().max())
+_ACTIVITY = (
+    "buys",
+    "sells",
+    "volume",
+    "max_abs_q",
+    "mean_abs_q",
+    "terminal_q",
+    "share_at_limit",
+    "mean_quoted_spread",
+    "picked_off",
+)
 
 
 def build_summary(
-    cfg: Config, info: RunInfo, strategy: str, params: dict[str, object], episodes: pd.DataFrame
+    cfg: Config,
+    info: RunInfo,
+    strategy: str,
+    params: dict[str, object],
+    episodes: pd.DataFrame,
+    checks: list[Check],
 ) -> dict[str, object]:
     a = cfg.analysis
     return {
@@ -48,11 +66,17 @@ def build_summary(
         },
         "decomposition_max_abs_error": decomposition_error(episodes),
         "markouts": markout_curve(cfg, episodes).to_dict("records"),
+        "checks": [{"name": c.name, "ok": c.ok, "detail": c.detail} for c in checks],
+        "suspicious": [c.name for c in checks if not c.ok],
     }
 
 
 def _report_md(
-    cfg: Config, summary: dict[str, object], episodes: pd.DataFrame, trials: int, figure: str
+    cfg: Config,
+    summary: dict[str, object],
+    episodes: pd.DataFrame,
+    checks: list[Check],
+    trials: int,
 ) -> str:
     a = cfg.analysis
     info = RunInfo(**summary["run"])  # type: ignore[arg-type]
@@ -65,8 +89,7 @@ def _report_md(
         "",
         setup_lines(info, a.seed, len(episodes), trials)
         + f"- strategy `{summary['strategy']}`, parameters `{json.dumps(summary['parameters'])}`\n"
-        f"- {cfg.market.n_steps} steps of dt = {cfg.market.dt:g} per episode, "
-        f"decomposition horizon h = {cfg.accounting.markout_horizon_steps} steps",
+        f"- {cfg.market.n_steps} steps of dt = {cfg.market.dt:g} per episode",
         "",
         "## Results (per episode)",
         "",
@@ -87,40 +110,7 @@ def _report_md(
         "",
         "## P&L decomposition (mean per episode)",
         "",
-        f"| part | mean | {level} CI |",
-        "|---|---|---|",
-    ]
-    means: dict[str, dict[str, float]] = summary["means"]  # type: ignore[assignment]
-    labels = {
-        "spread_capture": "spread capture",
-        "adverse_selection": "short-term move after fills (negative = adverse selection)",
-        "inventory_pnl": "inventory / holding P&L",
-        "fees": "fees paid (subtracted)",
-        "pnl_mtm": "**total: mark-to-market P&L**",
-    }
-    for c in _PARTS:
-        m = means[c]
-        lines.append(
-            f"| {labels[c]} | {fmt(m['mean'])} | [{fmt(m['ci_low'])}, {fmt(m['ci_high'])}] |"
-        )
-    err = float(summary["decomposition_max_abs_error"])  # type: ignore[arg-type]
-    flag = (
-        "" if err <= IDENTITY_TOLERANCE else " **SUSPICIOUS: the decomposition does not add up.**"
-    )
-    lines += [
-        "",
-        f"Identity check: the largest per-episode error of "
-        f"`spread + short-term + inventory - fees = P&L` is {err:.2e}.{flag}",
-        "",
-        "## Activity (mean per episode)",
-        "",
-        f"| metric | mean | {level} CI |",
-        "|---|---|---|",
-    ]
-    for c in _ACTIVITY:
-        m = means[c]
-        lines.append(f"| {c} | {fmt(m['mean'])} | [{fmt(m['ci_low'])}, {fmt(m['ci_high'])}] |")
-    lines += [
+        *decomposition_lines(cfg, episodes),
         "",
         "## Markouts by counterparty (mean per fill)",
         "",
@@ -128,25 +118,34 @@ def _report_md(
         "is the edge at the fill; a curve that falls with h means the flow was informed. The "
         "market maker cannot see the counterparty type; the analysis can.",
         "",
-        f"| counterparty | fills | h | markout | {level} CI |",
-        "|---|---|---|---|---|",
-    ]
-    rows: list[dict[str, float | str]] = summary["markouts"]  # type: ignore[assignment]
-    for r in rows:
-        if r["fills"] == 0:
-            continue
-        lines.append(
-            f"| {r['counterparty']} | {r['fills']} | {r['horizon']} "
-            f"| {fmt(float(r['markout']), 4)} "
-            f"| [{fmt(float(r['ci_low']), 4)}, {fmt(float(r['ci_high']), 4)}] |"
-        )
-    lines += [
+        *markout_lines(cfg, episodes),
         "",
         "![markout curves](markouts.png)",
         "",
-        "## Example episode",
+        "## Sanity checks",
         "",
-        f"![example episode]({figure})",
+        "A SUSPICIOUS line most likely means a bug: look for it before believing the numbers.",
+        "",
+    ]
+    lines += [f"- {'ok' if c.ok else '**SUSPICIOUS**'}: {c.name} ({c.detail})" for c in checks]
+    lines += [
+        "",
+        "## Activity (mean per episode)",
+        "",
+        f"| metric | mean | {level} CI |",
+        "|---|---|---|",
+    ]
+    means: dict[str, dict[str, float]] = summary["means"]  # type: ignore[assignment]
+    for c in _ACTIVITY:
+        m = means[c]
+        lines.append(f"| {c} | {fmt(m['mean'])} | [{fmt(m['ci_low'])}, {fmt(m['ci_high'])}] |")
+    lines += [
+        "",
+        "## Figures",
+        "",
+        "![terminal inventory](inventory_histogram.png)",
+        "",
+        "![example episode](example_episode.png)",
         "",
         "Episode 0 of this run. One episode is an illustration, not evidence.",
         "",
@@ -169,19 +168,17 @@ def write_run(
     trials: int,
 ) -> dict[str, object]:
     out_dir.mkdir(parents=True, exist_ok=False)
-    summary = build_summary(cfg, info, strategy_name, params, episodes)
+    checks = run_checks(cfg, strategy_name, params, episodes)
+    summary = build_summary(cfg, info, strategy_name, params, episodes, checks)
     episodes.to_csv(out_dir / "episodes.csv", float_format="%.10g")
     (out_dir / "summary.json").write_text(json.dumps(summary, indent=2) + "\n")
-    figure = "example_episode.png"
+    label = f"{strategy_name} {params}, scenario {info.scenario}"
     example_episode_figure(
         simulate_episode(cfg, strategy, 0),
-        f"{strategy_name} {params}, scenario {info.scenario}, seed {cfg.analysis.seed}, episode 0",
-        out_dir / figure,
+        f"{label}, seed {cfg.analysis.seed}, episode 0",
+        out_dir / "example_episode.png",
     )
-    markout_figure(
-        markout_curve(cfg, episodes),
-        f"Markouts: {strategy_name} {params}, scenario {info.scenario}",
-        out_dir / "markouts.png",
-    )
-    (out_dir / "report.md").write_text(_report_md(cfg, summary, episodes, trials, figure))
+    markout_figure(markout_curve(cfg, episodes), f"Markouts: {label}", out_dir / "markouts.png")
+    inventory_figure(episodes, f"Terminal inventory: {label}", out_dir / "inventory_histogram.png")
+    (out_dir / "report.md").write_text(_report_md(cfg, summary, episodes, checks, trials))
     return summary
