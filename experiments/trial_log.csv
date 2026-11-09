@@ -155,3 +155,4 @@ run_id,started_utc,git_commit,config_hash,experiment,scenario,strategy,parameter
 20261109T220045Z-da3d7c,2026-11-09T22:00:45+00:00,c119b9766964,fbe6c4ea5f6c,EXP-005,baseline,fixed,"{""half_spread"": 0.753666475, ""variant"": ""jumps""}",505,1000
 20261109T220045Z-da3d7c,2026-11-09T22:00:45+00:00,c119b9766964,fbe6c4ea5f6c,EXP-005,baseline,fixed,"{""half_spread"": 0.7486745106189073, ""variant"": ""jumps""}",505,1000
 20261109T220045Z-da3d7c,2026-11-09T22:00:45+00:00,c119b9766964,fbe6c4ea5f6c,EXP-005,baseline,fixed,"{""half_spread"": 0.7486745106189073, ""variant"": ""jumps""}",505,1000
+20261109T220319Z-48d238,2026-11-09T22:03:19+00:00,d4003da403b0,ebc690a89178,,toxic,fixed,"{""half_spread"": 0.75}",2,1000

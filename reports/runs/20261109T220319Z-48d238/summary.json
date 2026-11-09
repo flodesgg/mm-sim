@@ -1,0 +1,341 @@
+{
+  "run": {
+    "run_id": "20261109T220319Z-48d238",
+    "started_utc": "2026-11-09T22:03:19+00:00",
+    "git_commit": "d4003da403b0",
+    "git_dirty": false,
+    "config_hash": "ebc690a89178",
+    "scenario": "toxic"
+  },
+  "strategy": "fixed",
+  "parameters": {
+    "half_spread": 0.75
+  },
+  "seed": 2,
+  "episodes": 1000,
+  "ci_level": 0.95,
+  "pnl_mtm": {
+    "n": 1000.0,
+    "mean": 54.673918042349165,
+    "ci_low": 53.60840193727372,
+    "ci_high": 55.73943414742461,
+    "std": 17.1705987075435,
+    "sharpe_per_episode": 3.1841590950657683,
+    "q05": 22.882881710754646,
+    "es05": 6.125271787031502,
+    "p_loss": 0.012,
+    "certainty_equivalent": -3.3522489030436287
+  },
+  "pnl_liquidated": {
+    "n": 1000.0,
+    "mean": 54.673918042349165,
+    "ci_low": 53.60840193727372,
+    "ci_high": 55.73943414742461,
+    "std": 17.1705987075435,
+    "sharpe_per_episode": 3.1841590950657683,
+    "q05": 22.882881710754646,
+    "es05": 6.125271787031502,
+    "p_loss": 0.012,
+    "certainty_equivalent": -3.3522489030436287
+  },
+  "means": {
+    "pnl_mtm": {
+      "mean": 54.673918042349165,
+      "ci_low": 53.60840193727372,
+      "ci_high": 55.73943414742461
+    },
+    "pnl_liquidated": {
+      "mean": 54.673918042349165,
+      "ci_low": 53.60840193727372,
+      "ci_high": 55.73943414742461
+    },
+    "spread_capture": {
+      "mean": 70.73060532266143,
+      "ci_low": 70.27314978901829,
+      "ci_high": 71.18806085630457
+    },
+    "adverse_selection": {
+      "mean": -16.96913290827401,
+      "ci_low": -17.70817647020206,
+      "ci_high": -16.23008934634596
+    },
+    "inventory_pnl": {
+      "mean": 0.9124456279617439,
+      "ci_low": 0.12273423345126011,
+      "ci_high": 1.7021570224722278
+    },
+    "fees": {
+      "mean": 0.0,
+      "ci_low": 0.0,
+      "ci_high": 0.0
+    },
+    "buys": {
+      "mean": 46.818,
+      "ci_low": 46.32561323219027,
+      "ci_high": 47.310386767809725
+    },
+    "sells": {
+      "mean": 46.87,
+      "ci_low": 46.40415379496143,
+      "ci_high": 47.335846205038564
+    },
+    "volume": {
+      "mean": 93.688,
+      "ci_low": 93.08214800542557,
+      "ci_high": 94.29385199457444
+    },
+    "max_abs_q": {
+      "mean": 13.478,
+      "ci_low": 13.093531773411023,
+      "ci_high": 13.862468226588977
+    },
+    "mean_abs_q": {
+      "mean": 6.3506100000000005,
+      "ci_low": 6.117505868852407,
+      "ci_high": 6.583714131147594
+    },
+    "terminal_q": {
+      "mean": -0.052,
+      "ci_low": -0.7948715854009143,
+      "ci_high": 0.6908715854009142
+    },
+    "share_at_limit": {
+      "mean": 0.0,
+      "ci_low": 0.0,
+      "ci_high": 0.0
+    },
+    "noise_capture_expected": {
+      "mean": 60.98229857926851,
+      "ci_low": 60.98229656605884,
+      "ci_high": 60.982300592478175
+    },
+    "mean_quoted_spread": {
+      "mean": 1.50995,
+      "ci_low": 1.50995,
+      "ci_high": 1.50995
+    },
+    "picked_off": {
+      "mean": 0.0,
+      "ci_low": 0.0,
+      "ci_high": 0.0
+    },
+    "picked_off_edge": {
+      "mean": 0.0,
+      "ci_low": 0.0,
+      "ci_high": 0.0
+    },
+    "fills_noise": {
+      "mean": 77.67,
+      "ci_low": 77.1863560994028,
+      "ci_high": 78.1536439005972
+    },
+    "fills_informed": {
+      "mean": 16.018,
+      "ci_low": 15.56133555944131,
+      "ci_high": 16.47466444055869
+    },
+    "markout_noise_0": {
+      "mean": 58.63772246158923,
+      "ci_low": 58.27254303734154,
+      "ci_high": 59.00290188583691
+    },
+    "markout_noise_1": {
+      "mean": 58.725750985832626,
+      "ci_low": 58.356034845983885,
+      "ci_high": 59.09546712568137
+    },
+    "markout_noise_2": {
+      "mean": 58.826233934169736,
+      "ci_low": 58.45167474419068,
+      "ci_high": 59.20079312414879
+    },
+    "markout_noise_5": {
+      "mean": 59.03734346899783,
+      "ci_low": 58.647592762492515,
+      "ci_high": 59.42709417550315
+    },
+    "markout_noise_10": {
+      "mean": 59.41463815234596,
+      "ci_low": 58.99643439362086,
+      "ci_high": 59.83284191107106
+    },
+    "markout_noise_20": {
+      "mean": 60.32812794752549,
+      "ci_low": 59.84911039971962,
+      "ci_high": 60.807145495331355
+    },
+    "markout_noise_50": {
+      "mean": 62.57276727248038,
+      "ci_low": 61.97792537643424,
+      "ci_high": 63.16760916852651
+    },
+    "markout_informed_0": {
+      "mean": 12.092882861072205,
+      "ci_low": 11.748105569025478,
+      "ci_high": 12.437660153118932
+    },
+    "markout_informed_1": {
+      "mean": 11.621706551177537,
+      "ci_low": 11.288027279317253,
+      "ci_high": 11.95538582303782
+    },
+    "markout_informed_2": {
+      "mean": 11.14166232572269,
+      "ci_low": 10.817627442082529,
+      "ci_high": 11.465697209362851
+    },
+    "markout_informed_5": {
+      "mean": 9.753518080005222,
+      "ci_low": 9.462188820694687,
+      "ci_high": 10.044847339315757
+    },
+    "markout_informed_10": {
+      "mean": 7.480785985168044,
+      "ci_low": 7.243637737837608,
+      "ci_high": 7.7179342324984805
+    },
+    "markout_informed_20": {
+      "mean": 3.02483703435516,
+      "ci_low": 2.866147041933642,
+      "ci_high": 3.1835270267766775
+    },
+    "markout_informed_50": {
+      "mean": -8.811294858092955,
+      "ci_low": -9.234042159600246,
+      "ci_high": -8.388547556585664
+    }
+  },
+  "decomposition_max_abs_error": 2.1174173525650986e-12,
+  "markouts": [
+    {
+      "counterparty": "noise",
+      "horizon": 0,
+      "markout": 0.754959732993295,
+      "ci_low": 0.7549410834771572,
+      "ci_high": 0.7549783825094328,
+      "fills": 77670
+    },
+    {
+      "counterparty": "noise",
+      "horizon": 1,
+      "markout": 0.7560930988262214,
+      "ci_low": 0.7551894070361598,
+      "ci_high": 0.7569967906162831,
+      "fills": 77670
+    },
+    {
+      "counterparty": "noise",
+      "horizon": 2,
+      "markout": 0.7573868151689164,
+      "ci_low": 0.7561301010866273,
+      "ci_high": 0.7586435292512055,
+      "fills": 77670
+    },
+    {
+      "counterparty": "noise",
+      "horizon": 5,
+      "markout": 0.7601048470322883,
+      "ci_low": 0.7581133658046586,
+      "ci_high": 0.762096328259918,
+      "fills": 77670
+    },
+    {
+      "counterparty": "noise",
+      "horizon": 10,
+      "markout": 0.7649625100083167,
+      "ci_low": 0.7621477318792877,
+      "ci_high": 0.7677772881373457,
+      "fills": 77670
+    },
+    {
+      "counterparty": "noise",
+      "horizon": 20,
+      "markout": 0.7767236764197951,
+      "ci_low": 0.772825798582956,
+      "ci_high": 0.7806215542566343,
+      "fills": 77670
+    },
+    {
+      "counterparty": "noise",
+      "horizon": 50,
+      "markout": 0.8056233716039704,
+      "ci_low": 0.7994924534820351,
+      "ci_high": 0.8117542897259056,
+      "fills": 77670
+    },
+    {
+      "counterparty": "informed",
+      "horizon": 0,
+      "markout": 0.7549558534818457,
+      "ci_low": 0.754909168945013,
+      "ci_high": 0.7550025380186783,
+      "fills": 16018
+    },
+    {
+      "counterparty": "informed",
+      "horizon": 1,
+      "markout": 0.7255404264688186,
+      "ci_low": 0.72353477940246,
+      "ci_high": 0.7275460735351771,
+      "fills": 16018
+    },
+    {
+      "counterparty": "informed",
+      "horizon": 2,
+      "markout": 0.6955713775579154,
+      "ci_low": 0.692564501927135,
+      "ci_high": 0.6985782531886958,
+      "fills": 16018
+    },
+    {
+      "counterparty": "informed",
+      "horizon": 5,
+      "markout": 0.608909856411863,
+      "ci_low": 0.6039993404796622,
+      "ci_high": 0.6138203723440638,
+      "fills": 16018
+    },
+    {
+      "counterparty": "informed",
+      "horizon": 10,
+      "markout": 0.46702372238531925,
+      "ci_low": 0.4599089956171107,
+      "ci_high": 0.4741384491535278,
+      "fills": 16018
+    },
+    {
+      "counterparty": "informed",
+      "horizon": 20,
+      "markout": 0.1888398697936796,
+      "ci_low": 0.1792953391479192,
+      "ci_high": 0.19838440043943997,
+      "fills": 16018
+    },
+    {
+      "counterparty": "informed",
+      "horizon": 50,
+      "markout": -0.5500870806650615,
+      "ci_low": -0.5663036459013184,
+      "ci_high": -0.5338705154288046,
+      "fills": 16018
+    }
+  ],
+  "checks": [
+    {
+      "name": "P&L decomposition adds up",
+      "ok": true,
+      "detail": "largest error 2.12e-12"
+    },
+    {
+      "name": "no profit below the break-even half-spread",
+      "ok": true,
+      "detail": "half-spread 0.75, theoretical break-even 0.071, lower end of the P&L CI 53.608"
+    },
+    {
+      "name": "the strategy does not beat the clairvoyant control",
+      "ok": true,
+      "detail": "strategy minus clairvoyant over 200 episodes: -32.70 [-41.60, -23.79] (clairvoyant mean 86.19; a control that sees the future, not a strategy)"
+    }
+  ],
+  "suspicious": []
+}
