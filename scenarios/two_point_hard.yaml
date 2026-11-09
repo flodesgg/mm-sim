@@ -1,0 +1,25 @@
+# Play mode, hard: 40 rounds, 60% informed, V is 98 or 102, uneven prior, 10 seconds per quote.
+
+scenario:
+  name: "two_point_hard"
+  description: "Play mode: two-point value 98/102, prior 0.35, 40 rounds, 60% informed, 10 s per quote"
+
+market:
+  process: "two_point"
+  world: "trades_only"
+  n_steps: 40
+  tick_size: 0.01
+  two_point:
+    v_high: 102.0
+    v_low: 98.0
+    p_high: 0.35
+
+flow:
+  glosten_milgrom:
+    mu: 0.6
+
+engine:
+  q_max: 1000
+
+play:
+  time_limit_sec: 10.0

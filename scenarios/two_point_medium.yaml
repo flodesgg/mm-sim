@@ -1,0 +1,25 @@
+# Play mode, medium: 30 rounds, 40% informed, V is 99 or 101, 20 seconds per quote.
+
+scenario:
+  name: "two_point_medium"
+  description: "Play mode: two-point value 99/101, 30 rounds, 40% informed, 20 s per quote"
+
+market:
+  process: "two_point"
+  world: "trades_only"
+  n_steps: 30
+  tick_size: 0.01
+  two_point:
+    v_high: 101.0
+    v_low: 99.0
+    p_high: 0.5
+
+flow:
+  glosten_milgrom:
+    mu: 0.4
+
+engine:
+  q_max: 1000
+
+play:
+  time_limit_sec: 20.0

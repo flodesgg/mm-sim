@@ -1,0 +1,23 @@
+# Play mode, easy: 20 rounds, one trader in five is informed, V is 99 or 101.
+# Glosten-Milgrom's first spread is mu * (V_H - V_L) = 0.4.
+
+scenario:
+  name: "two_point_easy"
+  description: "Play mode: two-point value 99/101, 20 rounds, 20% informed, no time limit"
+
+market:
+  process: "two_point"
+  world: "trades_only"
+  n_steps: 20
+  tick_size: 0.01
+  two_point:
+    v_high: 101.0
+    v_low: 99.0
+    p_high: 0.5
+
+flow:
+  glosten_milgrom:
+    mu: 0.2
+
+engine:
+  q_max: 1000

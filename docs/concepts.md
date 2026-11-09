@@ -181,3 +181,14 @@ that cannot be regenerated is not evidence.
 **Multiple comparisons and the trial log.** Try enough variants and one will look good by
 chance. Counting every run, and deciding the criteria before running, is what keeps a
 simulator from being a story generator.
+
+## Stage E
+
+**Making a market by hand.** In the game you are asked for a bid and an ask without knowing
+the value, exactly the interview exercise. The habits to practise: start with a spread wide
+enough for what the informed traders know (informed share times the value range), move both
+quotes after every trade in the direction of the trade, and narrow the spread as you learn.
+
+**Marking to the last trade.** During the game P&L is valued at the last trade price, because
+the true value is unknown. It can look fine while you are being run over: buying all the way
+down marks each purchase at the newest, lower price only after the next trade.

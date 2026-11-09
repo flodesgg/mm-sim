@@ -171,7 +171,13 @@ class AnalysisConfig(StrictModel):
     bootstrap_samples: int = Field(ge=100)
 
 
-# Sections that change simulation results. Paths and logging do not.
+class PlayConfig(StrictModel):
+    """The interactive game (`mm-sim play`). Does not affect simulations or the config hash."""
+
+    time_limit_sec: float | None = Field(gt=0)  # per quote; null = no limit
+
+
+# Sections that change simulation results. Paths, logging and play settings do not.
 MODEL_SECTIONS = ("market", "flow", "engine", "accounting", "strategies", "analysis")
 
 
@@ -187,6 +193,7 @@ class Config(StrictModel):
     # strategy name -> parameters; each strategy validates its own block (strategies/ registry)
     strategies: dict[str, dict[str, object]]
     analysis: AnalysisConfig
+    play: PlayConfig
 
     @model_validator(mode="after")
     def _cross_checks(self) -> Config:

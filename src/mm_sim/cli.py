@@ -5,6 +5,9 @@ Commands
   run --scenario X --strategy S [--episodes N] [--seed K]
                                 Monte Carlo run -> reports/runs/<run_id>/
   experiment EXP-NNN            run an approved, pre-registered experiment (once)
+  play --scenario two_point_easy [--seed K]
+                                the interactive quoting game; saved under play/
+  play-stats                    table and plot of the saved games
   reproduce EXP-NNN             rebuild a finished experiment's report and figures from
                                 scratch and verify the numbers against the stored ones
 """
@@ -15,6 +18,7 @@ import argparse
 import json
 import shutil
 import sys
+from datetime import UTC, datetime
 from pathlib import Path
 from types import ModuleType
 
@@ -22,6 +26,7 @@ import numpy as np
 import pandas as pd
 import yaml
 from pydantic import ValidationError
+from rich.console import Console
 
 from mm_sim import __version__
 from mm_sim.analysis import (
@@ -42,6 +47,8 @@ from mm_sim.analysis.montecarlo import run_monte_carlo, with_run_settings
 from mm_sim.analysis.trials import append_trial, count_trials
 from mm_sim.config import DEFAULT_CONFIG_PATH, Config, available_scenarios, load_config
 from mm_sim.logging_setup import setup_logging
+from mm_sim.play.game import GameAborted, run_game
+from mm_sim.play.history import load_history, progress_figure, save_game, stats_table
 from mm_sim.reports.run_report import write_run
 from mm_sim.runinfo import RunInfo, new_run_info
 from mm_sim.strategies import REGISTRY, build_strategy
@@ -169,6 +176,34 @@ def cmd_reproduce(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_play(args: argparse.Namespace) -> int:
+    cfg, info = _start(args)
+    # a fresh game each time unless a seed is given (the seed is saved with the game)
+    seed = args.seed if args.seed is not None else int(np.random.default_rng().integers(2**31))
+    console = Console()
+    try:
+        result = run_game(cfg, seed, console.input, console)
+    except GameAborted:
+        console.print("Game aborted; nothing saved.")
+        return 0
+    path = save_game(cfg, info.config_hash, result, f"{datetime.now(UTC):%Y%m%dT%H%M%SZ}")
+    console.print(f"Saved: {path} (seed {seed}). Progress: uv run mm-sim play-stats")
+    return 0
+
+
+def cmd_play_stats(args: argparse.Namespace) -> int:
+    cfg, _ = load_config(args.config)
+    history = load_history(cfg)
+    if history.empty:
+        print("No games yet. Play one: uv run mm-sim play --scenario two_point_easy")
+        return 0
+    print(stats_table(history).round(3).to_string(index=False))
+    figure = cfg.paths.play / "progress.png"
+    progress_figure(history, figure)
+    print(f"{len(history)} games; figure: {figure}")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="mm-sim", description=__doc__.splitlines()[0])
     parser.add_argument("--version", action="version", version=f"mm-sim {__version__}")
@@ -193,6 +228,15 @@ def build_parser() -> argparse.ArgumentParser:
     p_exp.add_argument("id", help="for example EXP-001")
     p_exp.add_argument("--config", type=Path, default=DEFAULT_CONFIG_PATH)
     p_exp.set_defaults(func=cmd_experiment)
+
+    p_play = sub.add_parser("play", help="interactive quoting game (two-point scenarios)")
+    add_common(p_play)
+    p_play.add_argument("--seed", type=int, default=None, help="default: a new random game")
+    p_play.set_defaults(func=cmd_play)
+
+    p_stats = sub.add_parser("play-stats", help="progress over the saved games")
+    p_stats.add_argument("--config", type=Path, default=DEFAULT_CONFIG_PATH)
+    p_stats.set_defaults(func=cmd_play_stats)
 
     p_rep = sub.add_parser("reproduce", help="rebuild a finished experiment and verify it")
     p_rep.add_argument("id", help="for example EXP-001")

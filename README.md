@@ -55,6 +55,8 @@ uv run mm-sim run --scenario baseline --strategy fixed --episodes 1000 --seed 1
                                                # -> reports/runs/<run_id>/report.md
 uv run mm-sim experiment EXP-001               # runs only if approved and the config hash matches
 uv run mm-sim reproduce EXP-001                # rebuild a finished experiment, verify its numbers
+uv run mm-sim play --scenario two_point_easy   # quote against informed and noise traders yourself
+uv run mm-sim play-stats                       # your progress over the saved games
 ```
 
 ## Layout

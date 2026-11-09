@@ -14,6 +14,15 @@ from mm_sim.config import Config
 from mm_sim.flow.noise import fill_probability
 
 
+def _normal_pdf(z: float) -> float:
+    return math.exp(-0.5 * z * z) / math.sqrt(2 * math.pi)
+
+
+def _normal_sf(z: float) -> float:
+    """1 - Phi(z)."""
+    return 0.5 * math.erfc(z / math.sqrt(2))
+
+
 def _average_over_tick(f: object, h: float, tick: float) -> float:
     """E[f(h + U)] with U uniform on [0, tick): outward rounding from a continuous mid puts
     each quote between h and h + tick away from it. tick = 0 gives f(h)."""
@@ -86,8 +95,8 @@ def fixed_mean_pnl_with_informed(cfg: Config, h: float) -> float:
         s_t = m.sigma * math.sqrt(m.dt * min(inf.horizon_steps, m.n_steps - t))
         if pi > 0 and s_t > 0:
             z = (d + inf.threshold) / s_t
-            q = float(stats.norm.sf(z))
-            tail = s_t * float(stats.norm.pdf(z))  # E[move; move > d + c_I]
+            q = _normal_sf(z)
+            tail = s_t * _normal_pdf(z)  # E[move; move > d + c_I]
             loss = pi * (tail - d * q)
         else:
             q, loss, tail = 0.0, 0.0, 0.0
@@ -146,7 +155,7 @@ def _expect_over_move(cfg: Config, lag: int, f: object, kink: float | None = Non
         if kink is not None and abs((kink - shift) / std) < 8:
             points = [(kink - shift) / std]
         value, _ = integrate.quad(
-            lambda z, shift=shift, std=std: f(shift + std * z) * stats.norm.pdf(z),
+            lambda z, shift=shift, std=std: f(shift + std * z) * _normal_pdf(z),
             -8,
             8,
             points=points,

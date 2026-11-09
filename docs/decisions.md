@@ -105,3 +105,19 @@ One line per decision or bug fix, newest last. Format: date — decision — rea
   so the build prompt's rule applies; variant values are invented.
 - 2026-11-09 — Kind-specific experiment settings live in the experiment file's `settings`
   block — robustness variants are parameters and must not be hard-coded.
+- 2026-11-09 — Play mode makes the human a `Strategy` (`HumanStrategy`, not registered) whose
+  `quote` asks for input; the game is one episode of the reference engine — no second market
+  implementation can drift from the simulations.
+- 2026-11-09 — A new game draws a fresh random seed unless `--seed` is given, and the seed is
+  saved with the game — otherwise every game would have the same value and traders; any game
+  can be replayed.
+- 2026-11-09 — A quote that exceeds the time limit is pulled for that round (no quotes), and
+  counted — a slow market maker is out of the market, it is not given a default quote.
+- 2026-11-09 — The Glosten–Milgrom reference in the game summary is computed from the trades
+  the player saw and ignores no-trade rounds — it is the standard GM update; the summary says
+  that a round without a trade is also informative.
+- 2026-11-09 — (delegated) Play scenarios: easy (20 rounds, 20% informed, no time limit),
+  medium (30 rounds, 40%, 20 s), hard (40 rounds, 60%, V 98/102, prior 0.35, 10 s) — invented
+  difficulty levels.
+- 2026-11-09 — `play` settings (`time_limit_sec`) are a config section outside the model hash —
+  they cannot change a simulation result.
