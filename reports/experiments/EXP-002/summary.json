@@ -1,0 +1,20 @@
+{
+  "run": {
+    "run_id": "20261109T213355Z-c3f5f0",
+    "started_utc": "2026-11-09T21:33:55+00:00",
+    "git_commit": "2c0240941c5c",
+    "git_dirty": false,
+    "config_hash": "92ddd4ad4197",
+    "scenario": "toxic"
+  },
+  "experiment": "EXP-002",
+  "seed": 202,
+  "episodes": 1000,
+  "decision": "CONFIRMED",
+  "checks": {
+    "C1 mean matches theory (|z| <= 4.0 in every cell)": true,
+    "C2 simulated break-even within 0.05 of theory at every informed intensity > 0": true,
+    "C3 simulated break-even rises with the informed intensity (where the theoretical break-even is inside the half-spread grid)": true
+  },
+  "suspicious": []
+}

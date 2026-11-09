@@ -19,8 +19,9 @@ See [STATUS.md](STATUS.md).
 | Experiment | Question | Result | File |
 |---|---|---|---|
 | EXP-001 | Fixed spread against noise traders only: does mean P&L follow the closed form, and where is the best half-spread? | CONFIRMED. Mean P&L within 2.1 standard errors of the formula at all 10 half-spreads (1000 episodes each, seed 101). Best grid point h = 0.7: mean 61.70, 95% CI [60.91, 62.49]; theory optimum 0.744, not 1/k = 0.667. | [report](reports/experiments/EXP-001/report.md), [pre-registration](experiments/EXP-001_fixed_spread_noise_only.md) |
+| EXP-002 | How wide must a fixed spread be to break even as informed traders arrive more often? | CONFIRMED. Mean P&L within 3.1 standard errors of the formula in all 70 cells (1000 episodes each, seed 202). Simulated break-even half-spread rises from 0.064 (informed arrival probability 0.2 per step) to 0.396 (1.0 per step); predicted 0.071 to 0.433. Informed traders know the value 50 steps ahead, an invented number. | [report](reports/experiments/EXP-002/report.md), [pre-registration](experiments/EXP-002_spread_vs_informed_intensity.md) |
 
-Variants tried so far: 11 (`experiments/trial_log.csv`).
+The number of variants tried is the number of lines in `experiments/trial_log.csv`.
 
 ## Questions the lab will answer (with plots and confidence intervals)
 

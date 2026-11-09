@@ -1,12 +1,12 @@
 ---
 id: EXP-002
 title: "Fixed half-spread against informed flow: mean P&L heatmap and break-even line"
-status: approved         # draft | approved | done
+status: done             # draft | approved | done
 approved_by: "delegation during an overnight run"  # Nick, 2026-11-09, delegated the build overnight; not reviewed by Nick before the run
 approved_on: 2026-11-09
 scenario: "toxic"
 config_hash: "92ddd4ad4197"
-decision: null           # CONFIRMED | REJECTED | INCONCLUSIVE
+decision: "CONFIRMED"    # CONFIRMED | REJECTED | INCONCLUSIVE
 kind: "spread_intensity_heatmap"
 strategy: "fixed"
 grid:
@@ -97,12 +97,76 @@ Precondition reported with the result: the largest share of steps at the invento
 
 ## Result
 
-Not run yet.
+Run once on 2026-11-09: git commit recorded in `reports/experiments/EXP-002/summary.json`
+(clean tree), config hash `92ddd4ad4197`, seed 202, 1000 episodes per cell. Numbers below are
+from `reports/experiments/EXP-002/cells.csv` and `break_even.csv`; the report with the heatmap
+is `reports/experiments/EXP-002/report.md`.
+
+Mean episode P&L (simulated):
+
+| λ_I | h=0.05 | 0.1 | 0.2 | 0.3 | 0.4 | 0.5 | 0.6 | 0.75 | 1.0 | 1.5 |
+|---|---|---|---|---|---|---|---|---|---|---|
+| 0 | 11.1 | 19.8 | 34.0 | 44.8 | 52.4 | 57.3 | 60.2 | 61.5 | 58.6 | 43.0 |
+| 20 | 4.2 | 13.1 | 27.7 | 39.0 | 47.2 | 52.7 | 56.2 | 58.2 | 56.4 | 42.1 |
+| 40 | -2.6 | 6.4 | 21.4 | 33.2 | 42.0 | 48.2 | 52.1 | 54.9 | 54.2 | 41.3 |
+| 80 | -16.2 | -6.8 | 9.0 | 21.8 | 31.6 | 39.0 | 44.0 | 48.4 | 50.0 | 39.8 |
+| 120 | -30.0 | -20.4 | -3.7 | 10.3 | 21.2 | 29.8 | 35.9 | 41.9 | 45.8 | 38.5 |
+| 160 | -43.7 | -33.7 | -16.2 | -1.2 | 10.7 | 20.5 | 27.8 | 35.4 | 41.4 | 36.9 |
+| 200 | -57.3 | -46.8 | -28.6 | -12.6 | 0.5 | 11.2 | 19.6 | 28.9 | 37.1 | 35.4 |
+
+Break-even half-spread:
+
+| λ_I | simulated | predicted | difference |
+|---|---|---|---|
+| 20 | 0.050 (upper bound) | 0.032 | 0.018 |
+| 40 | 0.064 | 0.071 | -0.007 |
+| 80 | 0.143 | 0.154 | -0.011 |
+| 120 | 0.226 | 0.244 | -0.017 |
+| 160 | 0.310 | 0.337 | -0.027 |
+| 200 | 0.396 | 0.433 | -0.036 |
+
+- C1 PASS: the largest `|z|` over the 70 cells is 3.10 (limit 4.0).
+- C2 PASS: the largest break-even difference is 0.036 (limit 0.05).
+- C3 PASS: the simulated break-even rises from 0.064 to 0.396 over `λ_I = 40 .. 200`.
+- No SUSPICIOUS flag. Share of steps at the inventory limit: 0 in every cell.
+
+Decomposition at `h = 0.4` (mean per episode): as `λ_I` goes from 0 to 200, spread capture
+rises from 51.6 to 86.8 (informed traders also pay the half-spread, 127 informed fills per
+episode at `λ_I = 200`), while the short-term move after fills falls from +0.3 to −89.6. The
+total falls from 52.4 to 0.5.
 
 ## Decision
 
-Not run yet.
+**CONFIRMED.** All three pre-registered criteria hold.
+
+What the verdict does not say:
+
+1. **All 70 z-scores are positive** (between 1.3 and 3.1, mean 2.3). The cells share one seed,
+   so this is one upward fluctuation of that sample, not 70 confirmations and not 70 warnings:
+   already without informed traders (`λ_I = 0`), where EXP-001 confirmed the formula on another
+   seed, this sample sits about 2 standard errors above theory, and the zero-mean parts of the
+   decomposition (short-term move plus inventory P&L) are +0.85 there. The same fluctuation
+   pushes every simulated break-even below the predicted one (differences −0.007 to −0.036).
+   A bias of the formula that grows with `λ_I` cannot be excluded from one seed; checking it
+   needs a new experiment on a new seed.
+2. This experiment was approved under delegation during an overnight run, not by Nick.
 
 ## What I learned
 
-Not run yet.
+About the model:
+
+- Adverse selection is paid for by the spread. At `h = 0.4` an informed trader in every step
+  (`λ_I = 200`) takes the mean P&L from 52 to about 0; the same quote that earns from noise
+  traders is exactly the quote the informed trader picks when it is wrong.
+- The break-even half-spread rises roughly linearly with the informed arrival rate here: about
+  0.07 at `π = 0.2`, 0.15 at 0.4, 0.31 at 0.8, 0.40 at 1.0 (simulated).
+- The profit-maximising half-spread also widens with informed flow: 0.75 for `λ_I ≤ 40`, 1.0
+  from `λ_I = 80` on (grid values).
+- Spread capture is a misleading number on its own: it goes up with informed flow because
+  informed traders trade often. The decomposition and the markout curve show the loss.
+- Selection works both ways: noise fills earn slightly more than the half-spread after the
+  fill, because a quote that no informed trader took is less likely to be wrong.
+
+What depends on the assumptions: the informed horizon (50 steps here; the edge scales with
+`σ·√(h_I·dt)`), informed traders who always trade when it pays, a market maker that never
+reacts to being hit, and noise flow that does not depend on the spread history.
