@@ -111,3 +111,7 @@ run_id,started_utc,git_commit,config_hash,experiment,scenario,strategy,parameter
 20261109T214608Z-0497ff,2026-11-09T21:46:08+00:00,741ba8fd1ee7,d1c8fe6df97e,EXP-004,jumpy,fixed,"{""engine.requote_every"": 5, ""half_spread"": 0.75}",404,1000
 20261109T214608Z-0497ff,2026-11-09T21:46:08+00:00,741ba8fd1ee7,d1c8fe6df97e,EXP-004,jumpy,fixed,"{""engine.requote_every"": 10, ""half_spread"": 0.75}",404,1000
 20261109T214608Z-0497ff,2026-11-09T21:46:08+00:00,741ba8fd1ee7,d1c8fe6df97e,EXP-004,jumpy,fixed,"{""engine.requote_every"": 20, ""half_spread"": 0.75}",404,1000
+20261109T214827Z-61dfe1,2026-11-09T21:48:27+00:00,f6443b837a70,462cf8b0d9ce,,inventory,skew,"{""half_spread"": 0.75, ""kappa"": 0.05}",1,1000
+20261109T214831Z-fa6890,2026-11-09T21:48:31+00:00,f6443b837a70,462cf8b0d9ce,,inventory,avellaneda_stoikov,"{""gamma"": 0.1}",1,1000
+20261109T214835Z-c27ee2,2026-11-09T21:48:35+00:00,f6443b837a70,462cf8b0d9ce,,inventory,fixed,"{""half_spread"": 0.75}",1,1000
+20261109T214839Z-19ae70,2026-11-09T21:48:39+00:00,f6443b837a70,d1c8fe6df97e,,jumpy,fixed,"{""half_spread"": 0.75}",1,1000
