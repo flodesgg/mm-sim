@@ -1,9 +1,9 @@
 ---
 id: EXP-001
 title: "Fixed half-spread against noise flow only: P&L mean and std versus theory"
-status: draft            # draft | approved | done
-approved_by: null        # Nick
-approved_on: null        # YYYY-MM-DD
+status: approved         # draft | approved | done
+approved_by: "Nick"      # approved in chat: "Утверждаю EXP-001"
+approved_on: 2026-11-09
 scenario: "baseline"
 config_hash: "98f30782c37f"
 decision: null           # CONFIRMED | REJECTED | INCONCLUSIVE
