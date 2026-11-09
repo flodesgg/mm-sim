@@ -1,0 +1,24 @@
+# secrets (this project needs none; ignored anyway)
+.env
+.env.*
+
+# logs and downloaded data are never committed
+/logs/
+/data/
+
+# python / tooling
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.hypothesis/
+*.egg-info/
+dist/
+build/
+
+# os / editor
+.DS_Store
+.vscode/
+.idea/

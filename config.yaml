@@ -1,0 +1,74 @@
+# Base configuration of the market-making simulator. Scenarios in scenarios/*.yaml override it.
+# Symbols follow docs/model_notes.md. Quote every string value: bare yes/no/on/off are booleans
+# in YAML (the loader rejects them with a clear message).
+#
+# The base numbers follow the simulation section of Avellaneda & Stoikov (2008):
+# see docs/model_notes.md for what was checked against the paper.
+
+project:
+  name: "mm-sim"
+  simulation_only: true
+
+scenario:
+  name: "base"
+  description: "Random-walk value, public mid, noise traders only"
+
+paths:
+  reports: "reports"
+  experiments: "experiments"
+  logs: "logs"
+  play: "play"
+
+logging:
+  level: "INFO"
+  file: "mm_sim.log"
+  max_bytes: 1000000
+  backup_count: 5
+
+market:
+  process: "random_walk"      # random_walk | jump_diffusion | two_point
+  world: "public_mid"         # public_mid | trades_only (trades_only goes with two_point)
+  s0: 100.0                   # V_0
+  sigma: 2.0                  # volatility per sqrt(unit of time)
+  dt: 0.005                   # step length
+  n_steps: 200                # N; horizon T = N*dt = 1
+  tick_size: 0.01             # quotes are rounded outwards to this grid
+  jump:                       # used by jump_diffusion only
+    intensity: 0.0            # lambda_J
+    size: 0.0                 # J
+    size_dist: "fixed"        # fixed (+-J) | normal (N(0, J^2))
+  two_point:                  # used by two_point only
+    v_high: 101.0
+    v_low: 99.0
+    p_high: 0.5
+
+flow:
+  noise:                      # fill probability 1 - exp(-A*exp(-k*distance)*dt)
+    A: 140.0
+    k: 1.5
+  informed:
+    intensity: 0.0            # lambda_I; 0 = no informed traders
+    horizon_steps: 10         # they know V at t + horizon_steps
+    threshold: 0.0            # c_I
+  glosten_milgrom:
+    mu: 0.3                   # probability the arriving trader is informed (two_point world)
+
+engine:
+  requote_every: 1            # 1 = requote every step (no latency)
+  q_max: 50                   # inventory limit, lots
+  maker_fee: 0.0              # per lot; negative = rebate
+  kill_switch_loss: null      # stop quoting when mark-to-market P&L < -loss; null = off
+  liq_half_spread: 0.0        # cost per lot of closing the final inventory
+  liq_impact: 0.0             # extra cost per lot for each lot of final inventory
+
+accounting:
+  markout_horizon_steps: 10   # h in the P&L decomposition (separate from informed.horizon_steps)
+  markout_curve_horizons: [0, 1, 2, 5, 10, 20, 50]
+
+strategies: {}                # filled stage by stage; each strategy validates its own block
+
+analysis:
+  episodes: 1000
+  seed: 1
+  ci_level: 0.95
+  cara_gamma: 0.1             # risk aversion in the certainty equivalent

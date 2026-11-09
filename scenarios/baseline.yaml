@@ -1,0 +1,17 @@
+# Baseline: the base config as it is, stated explicitly. A random-walk value with a public mid
+# and noise traders only (no informed flow, no jumps, no latency).
+
+scenario:
+  name: "baseline"
+  description: "Random walk, public mid, noise traders only, requote every step"
+
+market:
+  process: "random_walk"
+  world: "public_mid"
+
+flow:
+  informed:
+    intensity: 0.0
+
+engine:
+  requote_every: 1
