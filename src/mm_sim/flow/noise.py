@@ -17,7 +17,8 @@ from mm_sim.config import NoiseFlowConfig
 
 
 def fill_probability(distance: float, A: float, k: float, dt: float) -> float:
-    return 1.0 - math.exp(-A * math.exp(-k * distance) * dt)
+    # A quote far through the mid has a huge intensity; cap the exponent so exp cannot overflow
+    return 1.0 - math.exp(-A * math.exp(min(-k * distance, 700.0)) * dt)
 
 
 class NoiseFlow:

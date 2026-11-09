@@ -118,3 +118,46 @@ are how the information gets into the price.
 data looks brilliant and is worthless. The future-scramble test changes the future and checks
 that past quotes do not change. A strategy that cheats on purpose (`clairvoyant`) must fail
 the test; otherwise the test proves nothing.
+
+## Stage C
+
+**Quote skew.** Moving both quotes against the position: when long, quote lower, so selling
+becomes more likely and buying less likely. The market maker pays a little edge to get rid of
+inventory. It is the simplest form of inventory management.
+
+**Reservation price.** The price at which a risk-averse market maker is indifferent between
+holding its inventory and not holding it. Long inventory is a risk, so it values the asset
+below the mid and centres its quotes there; the more inventory, the more risk aversion, the
+more volatility and the more time left, the further from the mid.
+
+**Avellaneda–Stoikov.** A model that derives quotes for a market maker with CARA utility:
+quote around the reservation price `s − q·γ·σ²·(T − t)` with a spread that has a risk part and
+a part set by how fill probability decays with distance. The quotes in the paper are an
+approximation.
+
+**Risk aversion (γ).** How much expected profit the trader gives up to reduce variance. With
+`γ → 0` the Avellaneda–Stoikov quotes become symmetric with spread `2/k`; with large `γ` they
+are wide and react strongly to inventory.
+
+**Risk–return frontier.** A plot of mean P&L against its std for a family of strategies. A
+point up and to the left is better. It shows the price of risk reduction instead of a single
+"best" strategy.
+
+**Paired comparison.** Comparing two strategies episode by episode on the same random numbers
+and analysing the differences. Luck that both share cancels, so the confidence interval of the
+difference is much narrower than for two independent runs.
+
+**Bootstrap.** Estimating the uncertainty of a statistic that has no simple formula (a ratio
+of standard deviations, a certainty-equivalent difference) by recomputing it on many resamples
+of the episodes drawn with replacement.
+
+**Jump.** A sudden large move of the value, as on news. A quote that was fine a moment ago is
+now on the wrong side of the price.
+
+**Being picked off (sniped).** A stale quote is filled by someone who already sees the new
+price. The market maker sells below or buys above the current value. The loss per pick-off is
+how far the price moved through the quote; the number of pick-offs grows with latency. This is
+why real market makers spend so much on speed.
+
+**Liquidation cost.** Closing a position costs the spread and, for size, market impact. P&L
+that ignores it flatters strategies that finish with big inventory.

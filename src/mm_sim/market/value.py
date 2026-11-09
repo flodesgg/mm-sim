@@ -24,9 +24,37 @@ def two_point_path(cfg: MarketConfig, rng: np.random.Generator) -> NDArray[np.fl
     return np.full(cfg.n_steps + 1, v)
 
 
-def value_path(cfg: MarketConfig, rng: np.random.Generator) -> NDArray[np.float64]:
+def jump_increments(cfg: MarketConfig, rng: np.random.Generator) -> NDArray[np.float64]:
+    """The jump added to each of the N value moves: with probability lambda_J * dt a jump of
+    +-J (sign 50/50) or N(0, J^2), otherwise 0. Element t is the jump in the move V_t -> V_{t+1}."""
+    j = cfg.jump
+    happens = rng.random(cfg.n_steps) < j.intensity * cfg.dt
+    if j.size_dist == "fixed":
+        sizes = np.where(rng.random(cfg.n_steps) < 0.5, j.size, -j.size)
+    else:
+        sizes = j.size * rng.standard_normal(cfg.n_steps)
+    return np.where(happens, sizes, 0.0)
+
+
+def jump_diffusion_path(
+    cfg: MarketConfig, rng: np.random.Generator, jump_rng: np.random.Generator
+) -> NDArray[np.float64]:
+    """The random walk plus jumps. The diffusion part uses the same stream as `random_walk`,
+    so a jump scenario and its no-jump twin share the diffusion path."""
+    path = random_walk_path(cfg, rng)
+    path[1:] += np.cumsum(jump_increments(cfg, jump_rng))
+    return path
+
+
+def value_path(
+    cfg: MarketConfig, rng: np.random.Generator, jump_rng: np.random.Generator | None = None
+) -> NDArray[np.float64]:
     if cfg.process == "random_walk":
         return random_walk_path(cfg, rng)
     if cfg.process == "two_point":
         return two_point_path(cfg, rng)
+    if cfg.process == "jump_diffusion":
+        if jump_rng is None:
+            raise ValueError("jump_diffusion needs the jump stream")
+        return jump_diffusion_path(cfg, rng, jump_rng)
     raise NotImplementedError(f"value process {cfg.process!r} is not implemented yet")

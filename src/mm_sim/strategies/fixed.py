@@ -5,7 +5,7 @@ from __future__ import annotations
 from pydantic import Field
 
 from mm_sim.config import Config, StrictModel
-from mm_sim.strategies.base import Observation, Quotes, Strategy, register
+from mm_sim.strategies.base import Observation, Quotes, Strategy, register, within_limit
 
 
 class FixedParams(StrictModel):
@@ -23,4 +23,4 @@ class FixedSpread(Strategy):
 
     def quote(self, obs: Observation) -> Quotes:
         assert obs.mid is not None
-        return Quotes(bid=obs.mid - self._h, ask=obs.mid + self._h)
+        return within_limit(obs, obs.mid - self._h, obs.mid + self._h)

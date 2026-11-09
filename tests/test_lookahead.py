@@ -20,9 +20,8 @@ from helpers import make_cfg
 from numpy.typing import NDArray
 
 from mm_sim.config import Config
-from mm_sim.engine.reference import EpisodeResult, build_flows, run_episode
-from mm_sim.market.value import value_path
-from mm_sim.seeds import component_rng
+from mm_sim.engine.reference import EpisodeResult, build_flows, episode_values, run_episode
+from mm_sim.market.value import random_walk_path
 from mm_sim.strategies import REGISTRY, Strategy, build_strategy
 from mm_sim.strategies.clairvoyant import Clairvoyant
 
@@ -32,6 +31,10 @@ WORLDS: dict[str, dict[str, Any]] = {
     "latency": {
         "flow": {"informed": {"intensity": 80.0, "horizon_steps": 20}},
         "engine": {"requote_every": 3},
+    },
+    "jumps": {
+        "market": {"process": "jump_diffusion", "jump": {"intensity": 5.0, "size": 1.0}},
+        "engine": {"requote_every": 5},
     },
     "two_point": {
         "market": {"process": "two_point", "world": "trades_only", "n_steps": 100},
@@ -47,7 +50,7 @@ def scrambled(cfg: Config, values: NDArray[np.float64], t: int) -> NDArray[np.fl
         tp = cfg.market.two_point
         new[t + 1 :] = tp.v_low if values[0] == tp.v_high else tp.v_high
     else:
-        fresh = value_path(cfg.market, np.random.default_rng(987_654))
+        fresh = random_walk_path(cfg.market, np.random.default_rng(987_654))
         new[t + 1 :] = values[t] + (fresh[t + 1 :] - fresh[t])
     assert np.array_equal(new[: t + 1], values[: t + 1])
     assert not np.array_equal(new[t + 1 :], values[t + 1 :])  # the future really changed
@@ -64,7 +67,7 @@ def _run(
 
 
 def quotes_change_with_the_future(cfg: Config, strategy: Strategy, t: int) -> bool:
-    values = value_path(cfg.market, component_rng(cfg.analysis.seed, 0, "value"))
+    values = episode_values(cfg, 0)
     original = _run(cfg, strategy, values, values)
     rerun = _run(cfg, strategy, scrambled(cfg, values, t), values)
     same = np.array_equal(
@@ -109,7 +112,7 @@ def test_informed_fills_up_to_t_are_unchanged_by_the_scramble() -> None:
     the fills up to step t are the same in both runs."""
     cfg = make_cfg(**WORLDS["informed"])
     strategy, _ = build_strategy(cfg, "fixed")
-    values = value_path(cfg.market, component_rng(cfg.analysis.seed, 0, "value"))
+    values = episode_values(cfg, 0)
     a = _run(cfg, strategy, values, values)
     b = _run(cfg, strategy, scrambled(cfg, values, 60), values)
     assert [f for f in a.fills if f.t <= 60] == [f for f in b.fills if f.t <= 60]

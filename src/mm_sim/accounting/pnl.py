@@ -35,6 +35,9 @@ METRICS = (
     "terminal_q",
     "share_at_limit",
     "noise_capture_expected",
+    "mean_quoted_spread",
+    "picked_off",
+    "picked_off_edge",
 )
 
 
@@ -58,7 +61,8 @@ def episode_metrics(cfg: Config, res: EpisodeResult) -> dict[str, float]:
     v_end = float(res.values[n])
 
     spread = adverse = holding = 0.0
-    buys = sells = 0
+    buys = sells = picked_off = 0
+    picked_off_edge = 0.0
     for f in res.fills:
         v_fill = float(res.values[f.t])
         v_later = float(res.values[min(f.t + h, n)])
@@ -69,12 +73,18 @@ def episode_metrics(cfg: Config, res: EpisodeResult) -> dict[str, float]:
             buys += f.size
         else:
             sells += f.size
+        # picked off: a stale quote filled on the wrong side of the current value
+        if f.quote_age > 0 and f.side * (v_fill - f.price) < 0:
+            picked_off += f.size
+            picked_off_edge += f.side * f.size * (v_fill - f.price)
 
     q_end = int(res.inventory[n])
     pnl_mtm = res.cash + q_end * v_end
     eng = cfg.engine
     liquidation_cost = abs(q_end) * (eng.liq_half_spread + eng.liq_impact * abs(q_end))
     abs_q = np.abs(res.inventory[1:])  # inventory after each step
+    two_sided = ~(np.isnan(res.bids) | np.isnan(res.asks))
+    quoted_spread = float((res.asks - res.bids)[two_sided].mean()) if two_sided.any() else np.nan
     return {
         "pnl_mtm": pnl_mtm,
         "pnl_liquidated": pnl_mtm - liquidation_cost,
@@ -90,6 +100,9 @@ def episode_metrics(cfg: Config, res: EpisodeResult) -> dict[str, float]:
         "terminal_q": float(q_end),
         "share_at_limit": float((abs_q >= eng.q_max).mean()),
         "noise_capture_expected": noise_capture_expected(cfg, res),
+        "mean_quoted_spread": quoted_spread,  # over steps with both sides quoted
+        "picked_off": float(picked_off),
+        "picked_off_edge": picked_off_edge,  # sum of the (negative) edges of those fills
     }
 
 

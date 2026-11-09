@@ -70,3 +70,21 @@ One line per decision or bug fix, newest last. Format: date — decision — rea
   under the same delegation and marked "(delegated)" below. Unchanged: each experiment is
   written and committed before it runs, runs once, and the hard constraints of the build
   prompt hold (simulation only, repo private, Stage G not started).
+- 2026-11-09 — (delegated) Scenario `inventory`: liquidation cost `0.5 + 0.05*|q|` per lot —
+  without a cost liquidated and mark-to-market P&L are equal and "judged on liquidated P&L"
+  means nothing; the size is invented.
+- 2026-11-09 — (delegated) Scenario `jumpy`: jumps of +-1.0 at rate 5 per unit time, requote
+  every 5 steps, `q_max = 200` — a jump larger than the half-spread 0.75 puts a stale quote
+  through the value; invented.
+- 2026-11-09 — (delegated) EXP-003 thresholds (std cut of at least 25%, mean cost at most 15%)
+  set under the delegation, not by Nick, from the direction and rough size reported in Avellaneda & Stoikov (2008),
+  Table 1 — the build prompt reserved these numbers for Nick.
+- 2026-11-09 — A pick-off is a fill on a quote posted at an earlier step with a negative edge
+  at the fill — measurable per fill without knowing why the value moved; in the jump scenario
+  most of them follow a jump (tested).
+- 2026-11-09 — The jump stream is separate from the diffusion stream — a jump scenario and its
+  no-jump twin share the diffusion path, and adding the stream did not change any earlier
+  result (regression fixture unchanged).
+- 2026-11-09 — `fixed`, `skew` and `avellaneda_stoikov` pull the side that would breach the
+  inventory limit — the build prompt asks strategies to do so; fills are unchanged because the
+  engine enforced the limit already.

@@ -102,14 +102,15 @@ def test_ten_hand_computed_steps() -> None:
     """
     _, strategy, informed, noise, res = _run()
     assert res.fills == (
-        Fill(0, BOUGHT, 99.0, 1, "noise"),
-        Fill(1, SOLD, 101.0, 1, "informed"),
-        Fill(1, BOUGHT, 99.0, 1, "noise"),
-        Fill(2, BOUGHT, 100.5, 1, "informed"),
-        Fill(6, SOLD, 100.5, 1, "noise"),
-        Fill(7, SOLD, 100.5, 1, "informed"),
-        Fill(7, BOUGHT, 99.5, 1, "noise"),
-        Fill(9, SOLD, 100.5, 1, "noise"),
+        # (step, side, price, lots, counterparty, age of the quote in steps)
+        Fill(0, BOUGHT, 99.0, 1, "noise", 0),
+        Fill(1, SOLD, 101.0, 1, "informed", 1),
+        Fill(1, BOUGHT, 99.0, 1, "noise", 1),
+        Fill(2, BOUGHT, 100.5, 1, "informed", 0),
+        Fill(6, SOLD, 100.5, 1, "noise", 0),
+        Fill(7, SOLD, 100.5, 1, "informed", 1),
+        Fill(7, BOUGHT, 99.5, 1, "noise", 1),
+        Fill(9, SOLD, 100.5, 1, "noise", 1),
     )
     assert res.inventory.tolist() == [0, 1, 1, 2, 2, 2, 2, 1, 1, 1, 0]
     assert res.cash == pytest.approx(3.7, abs=1e-12)
@@ -174,6 +175,25 @@ def test_hand_computed_decomposition() -> None:
     assert m["mean_abs_q"] == pytest.approx(1.3)  # (1+1+2+2+2+2+1+1+1+0)/10
     assert m["share_at_limit"] == pytest.approx(0.4)  # after steps 2, 3, 4, 5
     assert m["terminal_q"] == 0
+    assert m["picked_off"] == 0  # every fill had a positive edge at the fill
+    # quoted spread over the steps with both sides: 2.0, 2.0, 1.0, 1.0, (ask pulled x2), 1.0 x4
+    assert m["mean_quoted_spread"] == pytest.approx(10.0 / 8)
+
+
+def test_stale_quote_picked_off_after_a_jump() -> None:
+    """requote_every=2. Quotes 99.0 / 101.0 posted at t=0 while V=100. The value jumps to 103
+    at t=1; the stale ask at 101.0 is lifted there: the market maker sells at 101 something
+    worth 103, edge -2 on a quote aged 1 step -> picked_off = 1. A fill on a fresh quote
+    (t=2, ask 104.0, V=103, edge +1) is not a pick-off."""
+    cfg = _cfg(maker_fee=0.0)
+    values = np.array([100, 103, 103, 103, 103, 103, 103, 103, 103, 103, 103], dtype=float)
+    quotes = [Quotes(99.0, 101.0), *([Quotes(102.0, 104.0)] * 4)]
+    noise = ScriptedFlow("noise", {1: (False, True), 2: (False, True)})
+    res = run_episode(cfg, ScriptedStrategy(quotes), values, [noise])
+    assert res.fills == (Fill(1, SOLD, 101.0, 1, "noise", 1), Fill(2, SOLD, 104.0, 1, "noise", 0))
+    m = episode_metrics(cfg, res)
+    assert m["picked_off"] == 1
+    assert m["spread_capture"] == pytest.approx(-2.0 + 1.0)
 
 
 def test_liquidated_pnl_charges_for_final_inventory() -> None:

@@ -1,0 +1,18 @@
+# Jumpy: the random walk plus jumps of +-1.0 (larger than the base half-spread 0.75) about
+# five times per episode, noise traders only, and a market maker that requotes every 5 steps.
+# The inventory limit is wide so that it does not bind. Invented numbers.
+
+scenario:
+  name: "jumpy"
+  description: "Jump diffusion, public mid, noise traders only, requote every 5 steps"
+
+market:
+  process: "jump_diffusion"
+  jump:
+    intensity: 5.0            # probability 0.025 per step
+    size: 1.0
+    size_dist: "fixed"
+
+engine:
+  requote_every: 5
+  q_max: 200

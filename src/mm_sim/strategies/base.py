@@ -67,6 +67,15 @@ class Strategy(ABC):
     def quote(self, obs: Observation) -> Quotes: ...
 
 
+def within_limit(obs: Observation, bid: float, ask: float) -> Quotes:
+    """Pull the side that would take the inventory beyond the limit (the engine enforces the
+    limit anyway; a strategy that knows the limit should not quote that side)."""
+    return Quotes(
+        bid=bid if obs.inventory < obs.q_max else None,
+        ask=ask if obs.inventory > -obs.q_max else None,
+    )
+
+
 REGISTRY: dict[str, type[Strategy]] = {}
 
 

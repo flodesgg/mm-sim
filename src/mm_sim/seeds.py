@@ -10,7 +10,7 @@ from __future__ import annotations
 import numpy as np
 
 # Fixed positions: adding a component appends to this tuple and never renumbers the others.
-COMPONENTS = ("value", "noise_fills", "informed_arrivals", "trader_types")
+COMPONENTS = ("value", "noise_fills", "informed_arrivals", "trader_types", "jumps")
 
 
 def component_rng(root_seed: int, episode: int, component: str) -> np.random.Generator:

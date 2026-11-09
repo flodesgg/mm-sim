@@ -168,6 +168,7 @@ class AnalysisConfig(StrictModel):
     seed: int = Field(ge=0)  # root seed; every episode and component gets a spawned stream
     ci_level: float = Field(gt=0.5, lt=1)
     cara_gamma: float = Field(gt=0)  # risk aversion in the certainty equivalent
+    bootstrap_samples: int = Field(ge=100)
 
 
 # Sections that change simulation results. Paths and logging do not.

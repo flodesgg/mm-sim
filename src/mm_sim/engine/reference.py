@@ -40,6 +40,7 @@ class Fill:
     price: float
     size: int  # lots
     counterparty: str
+    quote_age: int = 0  # steps since the filled quote was posted (0 = posted this step)
 
 
 @dataclass(frozen=True)
@@ -73,6 +74,7 @@ def run_episode(
     inventory = np.zeros(n + 1, dtype=np.int64)
     q, cash, fees = 0, 0.0, 0.0
     quotes = Quotes(None, None)
+    quoted_at = 0  # step at which the standing quotes were posted
     killed_at: int | None = None
     fills: list[Fill] = []
     tape: list[Trade] = []
@@ -103,6 +105,7 @@ def run_episode(
                 tape=tuple(tape),
             )
             quotes = _rounded(strategy.quote(obs), market.tick_size)
+            quoted_at = t
             past_quotes.append(PastQuote(t, quotes.bid, quotes.ask))
         if quotes.bid is not None:
             bids[t] = quotes.bid
@@ -116,12 +119,12 @@ def run_episode(
         for flow in flows:
             hit, lift = flow.act(t, bid, ask)
             if hit and bid is not None:
-                fills.append(Fill(t, BOUGHT, bid, 1, flow.counterparty))
+                fills.append(Fill(t, BOUGHT, bid, 1, flow.counterparty, t - quoted_at))
                 tape.append(Trade(t, bid, -1))
                 q, cash, fees = q + 1, cash - bid - eng.maker_fee, fees + eng.maker_fee
                 bid = None  # at most one fill per side per step
             if lift and ask is not None:
-                fills.append(Fill(t, SOLD, ask, 1, flow.counterparty))
+                fills.append(Fill(t, SOLD, ask, 1, flow.counterparty, t - quoted_at))
                 tape.append(Trade(t, ask, +1))
                 q, cash, fees = q - 1, cash + ask - eng.maker_fee, fees + eng.maker_fee
                 ask = None
@@ -157,9 +160,17 @@ def build_flows(
     return [GMInformedFlow(mu, known, types), GMNoiseFlow(mu, types, sides)]
 
 
+def episode_values(cfg: Config, episode: int) -> NDArray[np.float64]:
+    """The true-value path of one episode, from its own streams."""
+    seed = cfg.analysis.seed
+    return value_path(
+        cfg.market, component_rng(seed, episode, "value"), component_rng(seed, episode, "jumps")
+    )
+
+
 def simulate_episode(cfg: Config, strategy: Strategy, episode: int) -> EpisodeResult:
     """Draw this episode's random inputs from its own streams and run it."""
-    values = value_path(cfg.market, component_rng(cfg.analysis.seed, episode, "value"))
+    values = episode_values(cfg, episode)
     # Test-only hook for the `clairvoyant` negative control: the only way a strategy can get
     # the true path. No registered strategy defines it.
     peek = getattr(strategy, "test_only_peek", None)

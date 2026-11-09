@@ -18,7 +18,7 @@ import yaml
 from pydantic import ValidationError
 
 from mm_sim import __version__
-from mm_sim.analysis import exp_fixed_spread, exp_heatmap
+from mm_sim.analysis import exp_fixed_spread, exp_frontier, exp_heatmap, exp_latency
 from mm_sim.analysis.experiment import (
     ExperimentError,
     check_runnable,
@@ -37,6 +37,8 @@ from mm_sim.strategies import REGISTRY, build_strategy
 EXPERIMENT_KINDS = {
     "fixed_spread_sweep": exp_fixed_spread.run,
     "spread_intensity_heatmap": exp_heatmap.run,
+    "inventory_frontier": exp_frontier.run,
+    "latency_sweep": exp_latency.run,
 }
 
 

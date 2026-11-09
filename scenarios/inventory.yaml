@@ -1,0 +1,11 @@
+# Inventory: the baseline with a cost of closing the final position, so that strategies which
+# end with large inventory pay for it. Closing q lots costs 0.5 + 0.05*|q| per lot
+# (for example 10 lots: 1.0 per lot, 10 in total). Invented numbers.
+
+scenario:
+  name: "inventory"
+  description: "Baseline (noise only) with a liquidation cost on the final inventory"
+
+engine:
+  liq_half_spread: 0.5
+  liq_impact: 0.05

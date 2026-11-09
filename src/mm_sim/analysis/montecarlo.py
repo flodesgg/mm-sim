@@ -20,6 +20,7 @@ def with_run_settings(cfg: Config, seed: int | None, episodes: int | None) -> Co
         seed=a.seed if seed is None else seed,
         ci_level=a.ci_level,
         cara_gamma=a.cara_gamma,
+        bootstrap_samples=a.bootstrap_samples,
     )
     return cfg.model_copy(update={"analysis": new})
 

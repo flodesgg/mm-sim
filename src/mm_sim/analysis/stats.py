@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
+
 import numpy as np
-from numpy.typing import ArrayLike
+from numpy.typing import ArrayLike, NDArray
 from scipy import special, stats
 
 
@@ -42,3 +44,34 @@ def summarize(x: ArrayLike, level: float, cara_gamma: float) -> dict[str, float]
         "p_loss": float((a < 0).mean()),
         "certainty_equivalent": certainty_equivalent(a, cara_gamma),
     }
+
+
+def paired_comparison(a: ArrayLike, b: ArrayLike, level: float) -> dict[str, float]:
+    """Mean of the per-episode differences a - b for two strategies run on common random
+    numbers, with its CI, next to the CI one would get by ignoring the pairing."""
+    x, y = np.asarray(a, dtype=float), np.asarray(b, dtype=float)
+    n = len(x)
+    mean, lo, hi = mean_ci(x - y, level)
+    unpaired_se = float(np.sqrt(x.var(ddof=1) / n + y.var(ddof=1) / n))
+    unpaired_half = float(stats.t.ppf(0.5 + level / 2, 2 * n - 2)) * unpaired_se
+    paired_half = (hi - lo) / 2
+    return {
+        "mean_diff": mean,
+        "ci_low": lo,
+        "ci_high": hi,
+        "unpaired_ci_low": mean - unpaired_half,
+        "unpaired_ci_high": mean + unpaired_half,
+        "ci_width_ratio": paired_half / unpaired_half,  # < 1: pairing made the CI narrower
+        "correlation": float(np.corrcoef(x, y)[0, 1]),
+    }
+
+
+def bootstrap_ci(
+    statistic: Callable[[NDArray[np.int64]], float], n: int, level: float, seed: int, samples: int
+) -> tuple[float, float]:
+    """Percentile bootstrap over episodes. `statistic` receives resampled episode indices, so
+    paired quantities (a ratio of two strategies' stds, say) keep their pairing."""
+    rng = np.random.default_rng(seed)
+    draws = np.array([statistic(rng.integers(0, n, n)) for _ in range(samples)])
+    lo, hi = np.quantile(draws, [(1 - level) / 2, (1 + level) / 2])
+    return float(lo), float(hi)

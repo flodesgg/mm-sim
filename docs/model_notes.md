@@ -205,6 +205,41 @@ not change and a difference can only come from the strategy. Every registered st
 tested in every world it runs in. The `clairvoyant` strategy, which reads the future through
 `simulate_episode`'s test-only hook, fails the test, as it must.
 
+## 13. Stale quotes: fixed spread with slow requoting (derived here, tested)
+
+Assumptions: `fixed` strategy, noise traders only, inventory limit not binding, requote every
+`m` steps. A quote posted at step `t0` from the value `V_{t0}` is still there at step
+`t0 + j` (`j = 0 .. m−1`). Let `D_j = V_{t0+j} − V_{t0}`. The ask is now at distance
+`d − D_j` from the current value and the bid at `d + D_j`. Noise traders fill a quote at
+distance `x` with probability `p(x)`, which is close to 1 when `x` is very negative (the quote
+is through the value), and such a fill earns `x` against the current value. After the fill
+the value is a martingale. With `D_j` symmetric:
+
+```
+E[P&L]       = Σ_steps 2·E[g(d − D_age)],  g(x) = x·p(x)
+E[pick-offs] = Σ_steps with age > 0  2·E[p(d − D_age); D_age > d]
+```
+
+`D_j` is a mixture: `N(0, σ²·j·dt)` from the diffusion plus `K` jumps of `±J`,
+`K ~ Binomial(j, λ_J·dt)`. The expectations are computed by numerical integration over each
+mixture component. Code: `theory.latency_mean_pnl`, `theory.latency_pick_offs`. Tests:
+`tests/test_inventory_and_latency.py`. The full check is EXP-004.
+
+A pick-off is defined in the accounting as a fill on a quote posted at an earlier step whose
+edge at the fill is negative.
+
+## 14. Avellaneda–Stoikov and skew (formulas from the paper, tested)
+
+`avellaneda_stoikov` uses the paper's eq. (29) and (30) as quoted in section 8. Tests
+(`tests/test_inventory_and_latency.py`): the spread for `γ = 0.1, σ = 2, k = 1.5, T − t = 1`
+is `0.4 + 20·ln(1.0667) = 1.6908` by hand; the reservation price equals the mid at `q = 0`
+and moves against the inventory symmetrically; the spread tends to `2/k` as `γ → 0`; the risk
+part `γ·σ²·(T − t)` shrinks linearly to zero at `T`. Averaged over an episode the quoted spread
+is `γ·σ²·T/2·(N+1)/N + (2/γ)·ln(1 + γ/k) = 1.49`, the value the paper reports for `γ = 0.1`.
+
+`skew` shifts both `fixed` quotes by `−κ·q`; with `κ = 0` its fills are identical to `fixed`.
+All three public-mid strategies pull the side that would breach the inventory limit.
+
 ## 8. References and what was checked
 
 Checked on 2026-11-09 by opening the pages listed. "Metadata" means the bibliographic record
