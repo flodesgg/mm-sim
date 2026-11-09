@@ -7,11 +7,12 @@ from pathlib import Path
 
 import pandas as pd
 
+from mm_sim.analysis.markouts import markout_curve
 from mm_sim.analysis.stats import mean_ci, summarize
 from mm_sim.config import Config
 from mm_sim.engine.reference import simulate_episode
 from mm_sim.reports.common import LIMITATIONS, fmt, setup_lines
-from mm_sim.reports.figures import example_episode_figure
+from mm_sim.reports.figures import example_episode_figure, markout_figure
 from mm_sim.runinfo import RunInfo
 from mm_sim.strategies.base import Strategy
 
@@ -46,6 +47,7 @@ def build_summary(
             for c in episodes.columns
         },
         "decomposition_max_abs_error": decomposition_error(episodes),
+        "markouts": markout_curve(cfg, episodes).to_dict("records"),
     }
 
 
@@ -120,6 +122,28 @@ def _report_md(
         lines.append(f"| {c} | {fmt(m['mean'])} | [{fmt(m['ci_low'])}, {fmt(m['ci_high'])}] |")
     lines += [
         "",
+        "## Markouts by counterparty (mean per fill)",
+        "",
+        "Markout at horizon h = side * (V at h steps after the fill - fill price). At h = 0 it "
+        "is the edge at the fill; a curve that falls with h means the flow was informed. The "
+        "market maker cannot see the counterparty type; the analysis can.",
+        "",
+        f"| counterparty | fills | h | markout | {level} CI |",
+        "|---|---|---|---|---|",
+    ]
+    rows: list[dict[str, float | str]] = summary["markouts"]  # type: ignore[assignment]
+    for r in rows:
+        if r["fills"] == 0:
+            continue
+        lines.append(
+            f"| {r['counterparty']} | {r['fills']} | {r['horizon']} "
+            f"| {fmt(float(r['markout']), 4)} "
+            f"| [{fmt(float(r['ci_low']), 4)}, {fmt(float(r['ci_high']), 4)}] |"
+        )
+    lines += [
+        "",
+        "![markout curves](markouts.png)",
+        "",
         "## Example episode",
         "",
         f"![example episode]({figure})",
@@ -153,6 +177,11 @@ def write_run(
         simulate_episode(cfg, strategy, 0),
         f"{strategy_name} {params}, scenario {info.scenario}, seed {cfg.analysis.seed}, episode 0",
         out_dir / figure,
+    )
+    markout_figure(
+        markout_curve(cfg, episodes),
+        f"Markouts: {strategy_name} {params}, scenario {info.scenario}",
+        out_dir / "markouts.png",
     )
     (out_dir / "report.md").write_text(_report_md(cfg, summary, episodes, trials, figure))
     return summary

@@ -1,0 +1,19 @@
+# Toxic: the baseline plus informed traders who know the value 50 steps ahead
+# (a move with std sigma*sqrt(50*dt) = 1.0). The inventory limit is set wide so that it does
+# not bind and the closed-form predictions apply. All three numbers are invented.
+
+scenario:
+  name: "toxic"
+  description: "Random walk, public mid, noise traders plus informed traders (horizon 50 steps)"
+
+flow:
+  informed:
+    intensity: 40.0           # arrival probability 0.2 per step
+    horizon_steps: 50
+    threshold: 0.0
+
+engine:
+  q_max: 200
+
+accounting:
+  markout_horizon_steps: 50   # same as the informed horizon

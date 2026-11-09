@@ -82,3 +82,39 @@ is a free option for whoever is faster.
 
 **Tick size and outward rounding.** Prices live on a grid. Rounding the bid down and the ask
 up means the quoted spread is never narrower than the strategy intended.
+
+## Stage B
+
+**Toxic flow and the markout curve.** Flow is toxic when the price moves against the market
+maker after it trades. The markout curve shows it: the average edge of a fill measured at
+longer and longer horizons. For noise fills it stays at the half-spread; for informed fills it
+starts at the half-spread and falls below zero. Real desks watch this curve per client or
+venue, because they cannot see who is informed either.
+
+**Break-even spread.** The spread at which income from noise traders exactly pays for losses
+to informed traders. The more informed traders there are, or the more they know, the wider it
+must be. This is why spreads widen before news.
+
+**Selection in who you trade with.** A quote is not hit at random. Informed traders take it
+exactly when it is wrong, so conditional on being filled the price is more likely to move
+against you. The same logic runs the other way: if an informed trader passed on your quote,
+that is mild good news about it.
+
+**Bayes' rule and the posterior.** The market maker starts with a prior probability that the
+value is high and updates it after every trade: a buy is more likely if the value is high, so
+a buy raises the probability. The updated number is the posterior.
+
+**Glosten–Milgrom quotes.** Set the ask to the expected value given that the next trade is a
+buy, and the bid given a sell. Then no trade is regretted on average: expected profit is zero
+(competition between market makers would force this). The spread exists purely because of
+adverse selection, even with no costs and no risk aversion, and it equals the informed share
+times the size of what the informed know.
+
+**Price discovery.** As trades arrive, the posterior moves toward the truth and the quotes
+converge on the true value. Informed traders lose their edge by trading on it: their orders
+are how the information gets into the price.
+
+**Look-ahead bias and a negative control.** A simulated strategy that accidentally uses future
+data looks brilliant and is worthless. The future-scramble test changes the future and checks
+that past quotes do not change. A strategy that cheats on purpose (`clairvoyant`) must fail
+the test; otherwise the test proves nothing.

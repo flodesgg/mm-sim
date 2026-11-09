@@ -1,0 +1,28 @@
+# Two-point (Glosten-Milgrom) world: V is 101 or 99 with equal probability, fixed for the
+# episode. The market maker sees only trades. One trader per step, informed with probability
+# mu = 0.3. The inventory limit is above the number of steps, so it can never close a side.
+# The tick is small so that outward rounding adds almost nothing to the Glosten-Milgrom quotes.
+
+scenario:
+  name: "two_point"
+  description: "Two-point value, trades only, Glosten-Milgrom flow (mu = 0.3)"
+
+market:
+  process: "two_point"
+  world: "trades_only"
+  n_steps: 100
+  tick_size: 0.0001
+  two_point:
+    v_high: 101.0
+    v_low: 99.0
+    p_high: 0.5
+
+flow:
+  glosten_milgrom:
+    mu: 0.3
+
+engine:
+  q_max: 1000
+
+accounting:
+  markout_horizon_steps: 10

@@ -6,7 +6,7 @@ from collections.abc import Iterable
 
 import pandas as pd
 
-from mm_sim.accounting.pnl import METRICS, episode_metrics
+from mm_sim.accounting.pnl import METRICS, episode_metrics, markout_columns, markout_sums
 from mm_sim.config import AnalysisConfig, Config
 from mm_sim.engine.reference import simulate_episode
 from mm_sim.strategies.base import Strategy
@@ -30,5 +30,9 @@ def run_monte_carlo(
     """Run the episodes (default 0 .. analysis.episodes - 1) and return their metrics,
     indexed by episode number. A row depends only on (seed, episode), not on the order."""
     order = list(range(cfg.analysis.episodes) if episodes is None else episodes)
-    rows = [episode_metrics(cfg, simulate_episode(cfg, strategy, e)) for e in order]
-    return pd.DataFrame(rows, index=pd.Index(order, name="episode"), columns=list(METRICS))
+    rows = []
+    for e in order:
+        res = simulate_episode(cfg, strategy, e)
+        rows.append({**episode_metrics(cfg, res), **markout_sums(cfg, res)})
+    columns = [*METRICS, *markout_columns(cfg)]
+    return pd.DataFrame(rows, index=pd.Index(order, name="episode"), columns=columns)

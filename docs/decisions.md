@@ -42,3 +42,25 @@ One line per decision or bug fix, newest last. Format: date — decision — rea
   in one shell line that ignored the exit code. Fixed in the next commit; from now on
   `make check && git commit`, never `;`. The Stage A acceptance run records that commit, whose
   simulation code is identical to the fixed one.
+- 2026-11-09 — Bug found before it was used: the first closed form for P&L with informed flow
+  ignored that noise fills are selected (they happen when no informed trader took the quote).
+  A smoke run on seed 4242 disagreed by 14 standard errors; the selection term was added and
+  `test_simulated_mean_matches_theory_with_informed_flow` now guards it.
+- 2026-11-09 — Scenario `toxic` uses an informed horizon of 50 steps and `q_max = 200` — with
+  the base horizon of 10 the informed edge is too small to move the break-even spread across
+  the grid; the wide limit keeps the closed form applicable. Invented numbers, approved by
+  Nick through EXP-002.
+- 2026-11-09 — Scenario `two_point` uses tick 0.0001 and `q_max = 1000` — outward rounding
+  adds half a tick of profit per fill to Glosten–Milgrom quotes, and a binding limit would
+  break the Bayes update.
+- 2026-11-09 — New strategy `fixed_prior` (fixed quotes around the prior mean) — the `fixed`
+  strategy needs a public mid, which the two-point world does not have, and Stage B needs a
+  naive benchmark there.
+- 2026-11-09 — In the future-scramble test the informed traders keep their knowledge of the
+  original path — otherwise their trades before step `t` change with the scramble and an
+  inventory-dependent strategy would fail the test without looking ahead.
+- 2026-11-09 — The regression test compares only the columns stored in the fixture — markout
+  columns were added to the per-episode table; the stored values must not move, and the
+  fixture was not regenerated.
+- 2026-11-09 — `clairvoyant` is not in the strategy registry — the CLI and experiments cannot
+  run it; only tests construct it.

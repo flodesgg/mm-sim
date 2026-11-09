@@ -9,9 +9,10 @@ conclusion in this repository is a conclusion about the model, not about real ma
 
 ## Status
 
-Stage A is done: a reference engine with noise traders and a fixed-spread strategy, exact P&L
-accounting, a Monte Carlo runner and reports. Informed traders, inventory management and
-latency come in later stages. See [STATUS.md](STATUS.md).
+Stages A and B are done: a reference engine with noise and informed traders, a fixed-spread
+strategy, the two-point world with Glosten–Milgrom quotes, exact P&L accounting with markout
+curves, a Monte Carlo runner and reports. Inventory management and latency come in Stage C.
+See [STATUS.md](STATUS.md).
 
 ## Results so far (statements about the model)
 

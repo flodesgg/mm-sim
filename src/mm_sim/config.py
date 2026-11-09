@@ -255,3 +255,17 @@ def load_config(
             f"{scenario}.yaml must set scenario.name to {scenario!r}, got {cfg.scenario.name!r}"
         )
     return cfg, cfg.model_hash()
+
+
+def with_overrides(cfg: Config, overrides: dict[str, object]) -> Config:
+    """A new validated config with dotted-path overrides, e.g. {"flow.informed.intensity": 40}."""
+    raw = cfg.model_dump(mode="json")
+    for path, value in overrides.items():
+        node = raw
+        *parents, leaf = path.split(".")
+        for key in parents:
+            node = node[key]
+        if leaf not in node:
+            raise KeyError(f"unknown config key {path!r}")
+        node[leaf] = value
+    return Config.model_validate(raw)

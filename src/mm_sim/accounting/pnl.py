@@ -91,3 +91,29 @@ def episode_metrics(cfg: Config, res: EpisodeResult) -> dict[str, float]:
         "share_at_limit": float((abs_q >= eng.q_max).mean()),
         "noise_capture_expected": noise_capture_expected(cfg, res),
     }
+
+
+COUNTERPARTIES = ("noise", "informed")
+
+
+def markout_columns(cfg: Config) -> list[str]:
+    """Per-episode markout columns: fill counts and markout sums per counterparty and horizon."""
+    cols = [f"fills_{c}" for c in COUNTERPARTIES]
+    cols += [
+        f"markout_{c}_{h}" for c in COUNTERPARTIES for h in cfg.accounting.markout_curve_horizons
+    ]
+    return cols
+
+
+def markout_sums(cfg: Config, res: EpisodeResult) -> dict[str, float]:
+    """For each counterparty and horizon h: the sum over its fills of d * (V_{t+h} - price),
+    with t + h clipped to the end. Divided by the fill count this is the markout curve:
+    at h = 0 it is the edge at the fill; it falls with h when the flow is informed."""
+    n = cfg.market.n_steps
+    out = dict.fromkeys(markout_columns(cfg), 0.0)
+    for f in res.fills:
+        out[f"fills_{f.counterparty}"] += f.size
+        for h in cfg.accounting.markout_curve_horizons:
+            later = float(res.values[min(f.t + h, n)])
+            out[f"markout_{f.counterparty}_{h}"] += f.side * f.size * (later - f.price)
+    return out

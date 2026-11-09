@@ -17,7 +17,16 @@ def random_walk_path(cfg: MarketConfig, rng: np.random.Generator) -> NDArray[np.
     return path
 
 
+def two_point_path(cfg: MarketConfig, rng: np.random.Generator) -> NDArray[np.float64]:
+    """V is drawn once (v_high with probability p_high, else v_low) and never moves."""
+    tp = cfg.two_point
+    v = tp.v_high if rng.random() < tp.p_high else tp.v_low
+    return np.full(cfg.n_steps + 1, v)
+
+
 def value_path(cfg: MarketConfig, rng: np.random.Generator) -> NDArray[np.float64]:
     if cfg.process == "random_walk":
         return random_walk_path(cfg, rng)
+    if cfg.process == "two_point":
+        return two_point_path(cfg, rng)
     raise NotImplementedError(f"value process {cfg.process!r} is not implemented yet")

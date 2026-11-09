@@ -23,6 +23,8 @@ from numpy.typing import NDArray
 from mm_sim.config import Config
 from mm_sim.engine.ticks import round_ask, round_bid
 from mm_sim.flow.base import Flow
+from mm_sim.flow.glosten_milgrom import GMInformedFlow, GMNoiseFlow
+from mm_sim.flow.informed import InformedFlow
 from mm_sim.flow.noise import NoiseFlow
 from mm_sim.market.value import value_path
 from mm_sim.seeds import component_rng
@@ -130,16 +132,37 @@ def run_episode(
     return EpisodeResult(values, bids, asks, inventory, tuple(fills), cash, fees, killed_at)
 
 
-def simulate_episode(cfg: Config, strategy: Strategy, episode: int) -> EpisodeResult:
-    """Draw this episode's random inputs from its own streams and run it."""
-    seed = cfg.analysis.seed
-    values = value_path(cfg.market, component_rng(seed, episode, "value"))
-    flows: list[Flow] = []
+def build_flows(
+    cfg: Config,
+    episode: int,
+    values: NDArray[np.float64],
+    informed_knowledge: NDArray[np.float64] | None = None,
+) -> list[Flow]:
+    """This episode's flows, informed first. `values` is the path the market sees (the mid in
+    the public_mid world); `informed_knowledge` is the path the informed traders know. They
+    are the same path except in the future-scramble test."""
+    seed, n = cfg.analysis.seed, cfg.market.n_steps
+    known = values if informed_knowledge is None else informed_knowledge
     if cfg.market.world == "public_mid":
+        flows: list[Flow] = []
         if cfg.flow.informed.intensity > 0:
-            raise NotImplementedError("informed traders are implemented in Stage B")
+            arrivals = component_rng(seed, episode, "informed_arrivals").random(n)
+            flows.append(InformedFlow(cfg.flow.informed, cfg.market.dt, known, arrivals))
         rng = component_rng(seed, episode, "noise_fills")
         flows.append(NoiseFlow.from_rng(cfg.flow.noise, cfg.market.dt, values, rng))
-    else:
-        raise NotImplementedError("the trades_only world is implemented in Stage B")
-    return run_episode(cfg, strategy, values, flows)
+        return flows
+    mu = cfg.flow.glosten_milgrom.mu
+    types = component_rng(seed, episode, "trader_types").random(n)
+    sides = component_rng(seed, episode, "noise_fills").random(n)
+    return [GMInformedFlow(mu, known, types), GMNoiseFlow(mu, types, sides)]
+
+
+def simulate_episode(cfg: Config, strategy: Strategy, episode: int) -> EpisodeResult:
+    """Draw this episode's random inputs from its own streams and run it."""
+    values = value_path(cfg.market, component_rng(cfg.analysis.seed, episode, "value"))
+    # Test-only hook for the `clairvoyant` negative control: the only way a strategy can get
+    # the true path. No registered strategy defines it.
+    peek = getattr(strategy, "test_only_peek", None)
+    if peek is not None:
+        peek(values)
+    return run_episode(cfg, strategy, values, build_flows(cfg, episode, values))

@@ -38,7 +38,7 @@ def test_registry_rejects_unknown_strategy_and_bad_parameters() -> None:
 
 def test_fixed_needs_the_public_mid() -> None:
     cfg = make_cfg(market={"process": "two_point", "world": "trades_only"})
-    with pytest.raises(ValueError, match="needs the public mid"):
+    with pytest.raises(ValueError, match=r"runs in market\.world"):
         build_strategy(cfg, "fixed")
 
 

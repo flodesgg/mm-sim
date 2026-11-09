@@ -54,7 +54,7 @@ class Strategy(ABC):
     """Base class. A subclass sets `name`, a `Params` schema, and implements `quote`."""
 
     name: ClassVar[str]
-    needs_mid: ClassVar[bool] = True
+    worlds: ClassVar[tuple[str, ...]] = ("public_mid",)  # where the strategy can run
     Params: ClassVar[type[StrictModel]]
 
     def __init__(self, cfg: Config, params: StrictModel) -> None:  # noqa: B027
@@ -87,7 +87,10 @@ def build_strategy(
     if name not in REGISTRY:
         raise ValueError(f"unknown strategy {name!r}; available: {sorted(REGISTRY)}")
     cls = REGISTRY[name]
-    if cls.needs_mid and cfg.market.world != "public_mid":
-        raise ValueError(f"strategy {name!r} needs the public mid (market.world 'public_mid')")
+    if cfg.market.world not in cls.worlds:
+        raise ValueError(
+            f"strategy {name!r} runs in market.world {list(cls.worlds)}, "
+            f"not in {cfg.market.world!r}"
+        )
     params = cls.Params.model_validate({**cfg.strategies.get(name, {}), **(overrides or {})})
     return cls(cfg, params), params.model_dump(mode="json")

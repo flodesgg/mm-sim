@@ -68,6 +68,9 @@ accounting:
 strategies:                   # each strategy validates its own block (src/mm_sim/strategies/)
   fixed:
     half_spread: 0.75         # h: bid = s - h, ask = s + h
+  fixed_prior:                # two_point world: fixed quotes around the prior mean
+    half_spread: 0.2
+  glosten_milgrom: {}         # two_point world: Bayesian quotes, no parameters of its own
 
 analysis:
   episodes: 1000

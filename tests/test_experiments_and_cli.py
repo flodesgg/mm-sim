@@ -191,3 +191,96 @@ def test_verdict_rule() -> None:
         [0.5, -1.0, 2.0], [1.0, 0.95, 1.05], [15, 12, 9], [41, 39, 60], (60.0, 50.0, 40.0)
     )
     assert verdict(best_far_away)[0] == "INCONCLUSIVE"
+
+
+# ---------------------------------------------------------------- EXP-002 kind (heatmap)
+
+HEATMAP_FRONT = """---
+id: EXP-902
+title: "test heatmap"
+status: approved
+approved_by: "Nick"
+approved_on: 2026-11-09
+scenario: "toxic"
+config_hash: "{config_hash}"
+decision: null
+kind: "spread_intensity_heatmap"
+strategy: "fixed"
+grid:
+  half_spread: [0.05, 0.4, 1.0]
+config_grid:
+  flow.informed.intensity: [0.0, 200.0]
+seed: 5
+episodes: 30
+---
+"""
+
+
+def test_simulated_break_even_by_hand() -> None:
+    """Means -10, -2, +6 at h = 0.1, 0.2, 0.4: the zero is a quarter of the way from 0.2 to
+    0.4 -> 0.25. Already positive at the first point -> that point. Never positive -> NaN."""
+    import math
+
+    import numpy as np
+
+    from mm_sim.analysis.exp_heatmap import simulated_break_even
+
+    h = np.array([0.1, 0.2, 0.4])
+    assert simulated_break_even(h, np.array([-10.0, -2.0, 6.0])) == pytest.approx(0.25)
+    assert simulated_break_even(h, np.array([1.0, 2.0, 3.0])) == 0.1
+    assert math.isnan(simulated_break_even(h, np.array([-3.0, -2.0, -1.0])))
+
+
+def test_cli_heatmap_experiment_writes_cells_and_break_even(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    config = _workspace(tmp_path)
+    _, h = load_config(config, "toxic")
+    (tmp_path / "experiments" / "EXP-902_test.md").write_text(HEATMAP_FRONT.format(config_hash=h))
+    assert main(["experiment", "EXP-902", "--config", str(config)]) == 0
+    out = tmp_path / "reports" / "experiments" / "EXP-902"
+    for name in ("cells.csv", "break_even.csv", "summary.json", "report.md", "heatmap.png"):
+        assert (out / name).stat().st_size > 0
+    cells = pd.read_csv(out / "cells.csv")
+    assert len(cells) == 6
+    no_informed = cells[cells["informed_intensity"] == 0]
+    assert (no_informed["fills_informed"] == 0).all()
+    assert (cells[cells["informed_intensity"] == 200]["fills_informed"] > 0).all()
+    be = pd.read_csv(out / "break_even.csv").set_index("informed_intensity")
+    assert be.loc[0.0, "break_even_theory"] == 0.0
+    assert 0.3 < be.loc[200.0, "break_even_theory"] < 0.6
+    log = pd.read_csv(tmp_path / "experiments" / "trial_log.csv")
+    assert len(log) == 6
+    report = (out / "report.md").read_text()
+    assert report.index("## Limitations") < report.index("## Results")
+
+
+def test_heatmap_verdict_rule_and_suspicious_flag() -> None:
+    from mm_sim.analysis.exp_heatmap import verdict as heatmap_verdict
+
+    def cells(z: float, ci_low_below_line: float) -> pd.DataFrame:
+        return pd.DataFrame(
+            {
+                "informed_intensity": [0.0, 0.0, 100.0, 100.0],
+                "half_spread": [0.1, 0.5, 0.1, 0.5],
+                "z_mean": [0.3, -0.5, z, 1.0],
+                "ci_low": [5.0, 30.0, ci_low_below_line, 10.0],
+            }
+        )
+
+    def be(sim: float) -> pd.DataFrame:
+        return pd.DataFrame(
+            {
+                "informed_intensity": [0.0, 100.0],
+                "break_even_simulated": [0.1, sim],
+                "break_even_theory": [0.0, 0.30],
+            }
+        )
+
+    assert heatmap_verdict(cells(1.0, -20.0), be(0.32))[0] == "CONFIRMED"
+    assert heatmap_verdict(cells(4.5, -20.0), be(0.32))[0] == "REJECTED"
+    assert heatmap_verdict(cells(1.0, -20.0), be(0.40))[0] == "REJECTED"
+    assert heatmap_verdict(cells(1.0, -20.0), be(0.09))[0] == "REJECTED"  # also not rising
+    decision, _, flags = heatmap_verdict(cells(1.0, 2.0), be(0.32))
+    assert len(flags) == 1 and "SUSPICIOUS" in flags[0]  # profit below the break-even line
+    assert decision == "CONFIRMED"  # the flag is reported next to the verdict, not hidden

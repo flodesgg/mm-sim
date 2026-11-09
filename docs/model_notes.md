@@ -131,6 +131,80 @@ Code: `src/mm_sim/analysis/theory.py`. Tests: `tests/test_montecarlo.py`
 (`test_simulated_mean_and_std_match_the_closed_form`, `test_theory_closed_form_without_tick`,
 `test_optimal_half_spread_tends_to_one_over_k_for_small_dt`). The full check is EXP-001.
 
+## 10. Fixed spread against noise and informed flow (derived here, tested)
+
+Assumptions as in section 9, plus informed traders with arrival probability `π = λ_I·dt` per
+step, horizon `h_I`, threshold `c_I`.
+
+Look at the ask at distance `d` in step `t`. Let `M = V_{t+h_I} − V_t`, normal with mean 0 and
+std `s_t = σ·√(dt·min(h_I, N − t))`. Write `z = (d + c_I)/s_t`, `Q = 1 − Φ`.
+
+- **Informed fill.** With probability `π` an informed trader is there; it lifts the ask if
+  `M > d + c_I`. The market maker sold at `V_t + d` something worth `V_t + M` at the informed
+  horizon (and, the value being a martingale, on average afterwards). Expected loss:
+  `π·E[(M − d); M > d + c_I] = π·(s_t·φ(z) − d·Q(z))`, using `E[M; M > a] = s·φ(a/s)`.
+- **Noise fill.** Noise can lift the ask only if no informed trader took it: probability
+  `1 − π·Q(z)`, then `p(d)`. It pays `d`. But "no informed trader took it" also selects the
+  steps without a large upward move, so the move after a noise fill is favourable on average:
+  `E[−M; ask free] = π·E[M; M > d + c_I] = π·s_t·φ(z)`.
+  Expected gain: `p(d)·(d·(1 − π·Q(z)) + π·s_t·φ(z))`.
+
+Per step and per side, expected P&L = noise gain − informed loss; the episode value sums over
+steps and doubles for the two sides. The break-even half-spread is the smallest `h` where this
+is zero. Code: `theory.fixed_mean_pnl_with_informed`, `theory.break_even_half_spread`. Tests:
+`tests/test_informed_and_gm.py`. The full check is EXP-002.
+
+The first version of this derivation left out the selection term `π·s_t·φ(z)`; a smoke run
+disagreed with it by 14 standard errors, which is how the mistake was found (before EXP-002
+was written).
+
+## 11. Glosten–Milgrom quotes in the two-point world (derived here, tested)
+
+`V ∈ {V_H, V_L}`, prior `P(V_H) = p`. Each step one trader arrives: informed with probability
+`μ` (buys if `V = V_H`, sells if `V = V_L`), otherwise noise (buys or sells with probability
+1/2). So
+
+```
+P(buy | V_H) = μ + (1−μ)/2        P(buy | V_L) = (1−μ)/2
+```
+
+and the sell probabilities are the same two, swapped. With posterior `π = P(V_H | trades)`,
+Bayes' rule gives `P(V_H | buy) = π·P(buy|V_H) / (π·P(buy|V_H) + (1−π)·P(buy|V_L))`, and the
+zero-expected-profit quotes are the expected value given the direction of the next trade:
+
+```
+ask = E[V | buy]  = V_L + (V_H − V_L)·P(V_H | buy)
+bid = E[V | sell] = V_L + (V_H − V_L)·P(V_H | sell)
+```
+
+At `π = 1/2`: `P(V_H | buy) = (1+μ)/2` and `P(V_H | sell) = (1−μ)/2`, so
+**`ask − bid = μ·(V_H − V_L)`**: the spread is the informed share times what the informed
+know. After each trade `π` moves to the posterior, the quotes follow, and the spread shrinks
+as the market maker learns the value.
+
+A fixed quote `E[V] ± h` (prior 1/2) earns `h − μ·(V_H − V_L)/2` per trade on average: it
+loses `(V_H − V_L)/2 − h` to an informed trader and earns `h` on average from a noise trader.
+It breaks even exactly at the first Glosten–Milgrom half-spread.
+
+Source: the model is that of Glosten & Milgrom (1985). The formulas above are derived here
+from Bayes' rule; the paper's full text was not read, so that it states them in this form is
+`from memory, unverified`. Code: `src/mm_sim/strategies/glosten_milgrom.py`. Tests:
+`tests/test_informed_and_gm.py` (closed form, posterior after three trades by hand, zero mean
+P&L, losing narrower fixed spread).
+
+Two modelling details: the informed trader trades only at a profit, and the inventory limit in
+the `two_point` scenario is above the number of steps, because a side closed by the limit
+would make "no trade" informative, which the Bayes update above ignores.
+
+## 12. The future-scramble test
+
+`tests/test_lookahead.py`. An episode is rerun with the value path after step `t` replaced by
+a different random path; all quotes up to and including `t` must be identical. Informed
+traders keep their knowledge of the original path in the rerun, so their trades up to `t` do
+not change and a difference can only come from the strategy. Every registered strategy is
+tested in every world it runs in. The `clairvoyant` strategy, which reads the future through
+`simulate_episode`'s test-only hook, fails the test, as it must.
+
 ## 8. References and what was checked
 
 Checked on 2026-11-09 by opening the pages listed. "Metadata" means the bibliographic record

@@ -10,6 +10,7 @@ matplotlib.use("Agg")
 
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 
 from mm_sim.engine.reference import BOUGHT, EpisodeResult
 
@@ -39,6 +40,34 @@ def example_episode_figure(res: EpisodeResult, title: str, path: Path) -> None:
     ax_q.axhline(0, color="grey", lw=0.5)
     ax_q.set_ylabel("inventory (lots)")
     ax_q.set_xlabel("step")
+    fig.tight_layout()
+    fig.savefig(path, dpi=DPI)
+    plt.close(fig)
+
+
+def markout_figure(curve: pd.DataFrame, title: str, path: Path) -> None:
+    """Mean markout per fill against the horizon, one line per counterparty, with CIs."""
+    fig, ax = plt.subplots(figsize=(7, 4))
+    colors = {"noise": "tab:blue", "informed": "tab:red"}
+    for name, part in curve.groupby("counterparty"):
+        if int(part["fills"].iloc[0]) == 0:
+            continue
+        ax.errorbar(
+            part["horizon"],
+            part["markout"],
+            yerr=[part["markout"] - part["ci_low"], part["ci_high"] - part["markout"]],
+            marker="o",
+            ms=4,
+            capsize=3,
+            color=colors.get(str(name), "black"),
+            label=f"{name} fills (n={int(part['fills'].iloc[0])})",
+        )
+    ax.axhline(0, color="grey", lw=0.5)
+    ax.set_xscale("symlog", linthresh=1)
+    ax.set_xlabel("horizon h (steps after the fill)")
+    ax.set_ylabel("mean markout per fill")
+    ax.set_title(title, fontsize=9)
+    ax.legend(fontsize=8)
     fig.tight_layout()
     fig.savefig(path, dpi=DPI)
     plt.close(fig)

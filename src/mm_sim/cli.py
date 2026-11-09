@@ -18,7 +18,7 @@ import yaml
 from pydantic import ValidationError
 
 from mm_sim import __version__
-from mm_sim.analysis import exp_fixed_spread
+from mm_sim.analysis import exp_fixed_spread, exp_heatmap
 from mm_sim.analysis.experiment import (
     ExperimentError,
     check_runnable,
@@ -34,7 +34,10 @@ from mm_sim.runinfo import RunInfo, new_run_info
 from mm_sim.strategies import REGISTRY, build_strategy
 
 # experiment kind -> function(cfg, experiment, run info, output directory) -> decision
-EXPERIMENT_KINDS = {"fixed_spread_sweep": exp_fixed_spread.run}
+EXPERIMENT_KINDS = {
+    "fixed_spread_sweep": exp_fixed_spread.run,
+    "spread_intensity_heatmap": exp_heatmap.run,
+}
 
 
 def _start(args: argparse.Namespace, scenario: str | None = None) -> tuple[Config, RunInfo]:

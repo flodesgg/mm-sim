@@ -145,4 +145,7 @@ def test_regression_scenario_matches_stored_results() -> None:
     if os.environ.get("MM_SIM_REGENERATE_FIXTURES") == "1":
         ep.to_csv(FIXTURE, float_format="%.12g")
     stored = pd.read_csv(FIXTURE, index_col="episode").astype(float)
-    pd.testing.assert_frame_equal(ep, stored, check_exact=False, rtol=1e-10, atol=1e-10)
+    # columns added later (e.g. markouts) are not in the fixture; the stored ones must not move
+    pd.testing.assert_frame_equal(
+        ep[list(stored.columns)], stored, check_exact=False, rtol=1e-10, atol=1e-10
+    )

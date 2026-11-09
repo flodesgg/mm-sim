@@ -33,6 +33,8 @@ class Experiment(StrictModel):
     kind: str  # which analysis runs it (see EXPERIMENT_KINDS in cli.py)
     strategy: str
     grid: dict[str, list[float]]  # strategy parameter -> values to sweep
+    # dotted config key -> values to sweep (optional)
+    config_grid: dict[str, list[float]] = Field(default_factory=dict)
     seed: int = Field(ge=0)
     episodes: int = Field(ge=1)
 
