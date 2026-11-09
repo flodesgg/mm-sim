@@ -1,1 +1,2 @@
 run_id,started_utc,git_commit,config_hash,experiment,scenario,strategy,parameters,seed,episodes
+20261109T210520Z-9e7c2f,2026-11-09T21:05:20+00:00,067bb5c7b737,98f30782c37f,,baseline,fixed,"{""half_spread"": 0.75}",1,1000

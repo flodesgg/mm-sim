@@ -1,2 +1,1 @@
-"""Cash, inventory, P&L decomposition and markouts (Stage A).
-"""
+"""Cash, inventory, P&L decomposition and markouts (Stage A)."""

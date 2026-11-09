@@ -37,3 +37,8 @@ One line per decision or bug fix, newest last. Format: date — decision — rea
   about 12%; the exact maximiser of the same formula is used.
 - 2026-11-09 — Experiments run on a seed never used while building (EXP-001: 101) — the
   stage's acceptance run at seed 1 shows one point of the curve before pre-registration.
+- 2026-11-09 — Process error: commit `067bb5c7b737` was made with `make check` red (six
+  package docstrings not formatted; no code difference). The check and the commit were chained
+  in one shell line that ignored the exit code. Fixed in the next commit; from now on
+  `make check && git commit`, never `;`. The Stage A acceptance run records that commit, whose
+  simulation code is identical to the fixed one.

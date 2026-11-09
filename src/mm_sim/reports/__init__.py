@@ -1,2 +1,1 @@
-"""Markdown + PNG report generator (Stage A onwards).
-"""
+"""Markdown + PNG report generator (Stage A onwards)."""
