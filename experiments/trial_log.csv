@@ -10,3 +10,6 @@ run_id,started_utc,git_commit,config_hash,experiment,scenario,strategy,parameter
 20261109T212048Z-f0ee9c,2026-11-09T21:20:48+00:00,6c91285cc39c,98f30782c37f,EXP-001,baseline,fixed,"{""half_spread"": 1.25}",101,1000
 20261109T212048Z-f0ee9c,2026-11-09T21:20:48+00:00,6c91285cc39c,98f30782c37f,EXP-001,baseline,fixed,"{""half_spread"": 1.5}",101,1000
 20261109T212048Z-f0ee9c,2026-11-09T21:20:48+00:00,6c91285cc39c,98f30782c37f,EXP-001,baseline,fixed,"{""half_spread"": 2.0}",101,1000
+20261109T213238Z-a03205,2026-11-09T21:32:38+00:00,cf39d19836df,92ddd4ad4197,,toxic,fixed,"{""half_spread"": 0.75}",1,1000
+20261109T213242Z-bc36a7,2026-11-09T21:32:42+00:00,cf39d19836df,ec7328416b85,,two_point,glosten_milgrom,{},1,1000
+20261109T213246Z-6c1ca4,2026-11-09T21:32:46+00:00,cf39d19836df,ec7328416b85,,two_point,fixed_prior,"{""half_spread"": 0.2}",1,1000
