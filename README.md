@@ -9,9 +9,10 @@ conclusion in this repository is a conclusion about the model, not about real ma
 
 ## Status
 
-Stages A and B are done: a reference engine with noise and informed traders, a fixed-spread
-strategy, the two-point world with Glosten–Milgrom quotes, exact P&L accounting with markout
-curves, a Monte Carlo runner and reports. Inventory management and latency come in Stage C.
+Stages A to C are done: a reference engine with noise and informed traders, jumps and
+requote latency; fixed, skew, Avellaneda–Stoikov and Glosten–Milgrom strategies; exact P&L
+accounting with markout curves; Monte Carlo with paired comparisons; four pre-registered
+experiments.
 See [STATUS.md](STATUS.md).
 
 ## Results so far (statements about the model)
@@ -20,8 +21,10 @@ See [STATUS.md](STATUS.md).
 |---|---|---|---|
 | EXP-001 | Fixed spread against noise traders only: does mean P&L follow the closed form, and where is the best half-spread? | CONFIRMED. Mean P&L within 2.1 standard errors of the formula at all 10 half-spreads (1000 episodes each, seed 101). Best grid point h = 0.7: mean 61.70, 95% CI [60.91, 62.49]; theory optimum 0.744, not 1/k = 0.667. | [report](reports/experiments/EXP-001/report.md), [pre-registration](experiments/EXP-001_fixed_spread_noise_only.md) |
 | EXP-002 | How wide must a fixed spread be to break even as informed traders arrive more often? | CONFIRMED. Mean P&L within 3.1 standard errors of the formula in all 70 cells (1000 episodes each, seed 202). Simulated break-even half-spread rises from 0.064 (informed arrival probability 0.2 per step) to 0.396 (1.0 per step); predicted 0.071 to 0.433. Informed traders know the value 50 steps ahead, an invented number. | [report](reports/experiments/EXP-002/report.md), [pre-registration](experiments/EXP-002_spread_vs_informed_intensity.md) |
+| EXP-003 | What does inventory management buy, against fixed quotes with the same average spread (paired on the same random numbers)? | CONFIRMED. Avellaneda–Stoikov with γ = 0.1 cuts the std of liquidated P&L to 0.417 of the benchmark's (95% CI [0.374, 0.464]; 1000 episodes, seed 303). Mark-to-market it costs about 5.7% of mean P&L; with the (invented) liquidation cost its mean is 1.40 higher [0.54, 2.26]. A simple skew does at least as well here. | [report](reports/experiments/EXP-003/report.md), [pre-registration](experiments/EXP-003_inventory_frontier.md) |
+| EXP-004 | What do stale quotes cost when the price jumps? | CONFIRMED. Requoting every 5 steps instead of every step: mean P&L 54.70 [53.47, 55.93] against 61.30 [60.23, 62.38], with 5.66 pick-offs per episode losing 0.35 each; every 20 steps: 30.07 (1000 episodes, seed 404). Matches the closed form. | [report](reports/experiments/EXP-004/report.md), [pre-registration](experiments/EXP-004_latency_and_jumps.md) |
 
-The number of variants tried is the number of lines in `experiments/trial_log.csv`.
+EXP-002 to EXP-004 were approved under delegation during an overnight run, not by Nick. The number of variants tried is the number of lines in `experiments/trial_log.csv`.
 
 ## Questions the lab will answer (with plots and confidence intervals)
 

@@ -1,0 +1,20 @@
+{
+  "run": {
+    "run_id": "20261109T214608Z-0497ff",
+    "started_utc": "2026-11-09T21:46:08+00:00",
+    "git_commit": "741ba8fd1ee7",
+    "git_dirty": true,
+    "config_hash": "d1c8fe6df97e",
+    "scenario": "jumpy"
+  },
+  "experiment": "EXP-004",
+  "seed": 404,
+  "episodes": 1000,
+  "decision": "CONFIRMED",
+  "checks": {
+    "C1 mean P&L matches theory (|z| <= 4.0 at every grid point)": true,
+    "C2 mean P&L falls strictly as requoting gets slower": true,
+    "C3 pick-offs per episode match theory (|z| <= 4.0 for requote_every > 1)": true,
+    "C4 pick-off fills have a negative edge (CI below 0 for requote_every > 1)": true
+  }
+}

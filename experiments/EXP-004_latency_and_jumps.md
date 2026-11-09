@@ -1,12 +1,12 @@
 ---
 id: EXP-004
 title: "Stale quotes: mean P&L and pick-offs against the requote interval, with jumps"
-status: approved         # draft | approved | done
+status: done             # draft | approved | done
 approved_by: "delegation during an overnight run"  # Nick, 2026-11-09, delegated the build overnight; not reviewed by Nick before the run
 approved_on: 2026-11-09
 scenario: "jumpy"
 config_hash: "d1c8fe6df97e"
-decision: null           # CONFIRMED | REJECTED | INCONCLUSIVE
+decision: "CONFIRMED"    # CONFIRMED | REJECTED | INCONCLUSIVE
 kind: "latency_sweep"
 strategy: "fixed"
 grid: {}
@@ -83,12 +83,52 @@ Precondition reported with the result: the share of steps at the inventory limit
 
 ## Result
 
-Not run yet.
+Run once on 2026-11-09: run id `20261109T214608Z-0497ff`, git commit `741ba8fd1ee7`, config
+hash `d1c8fe6df97e`, seed 404, 1000 episodes per grid point. The run metadata says
+"uncommitted changes": EXP-003 and EXP-004 were started one after the other, and EXP-003's
+output files were not yet committed when EXP-004 began. The code was the committed code.
+Numbers from `reports/experiments/EXP-004/latency.csv`; report:
+`reports/experiments/EXP-004/report.md`.
+
+| requote every | mean P&L [95% CI] | predicted | z | std | pick-offs [95% CI] | predicted | z | edge per pick-off [95% CI] |
+|---|---|---|---|---|---|---|---|---|
+| 1 | 61.30 [60.23, 62.38] | 60.98 | 0.58 | 17.30 | 0.00 | 0.00 | – | – |
+| 2 | 59.75 [58.66, 60.85] | 59.42 | 0.60 | 17.65 | 1.55 [1.47, 1.63] | 1.54 | 0.21 | -0.275 [-0.282, -0.269] |
+| 3 | 58.22 [57.11, 59.34] | 57.85 | 0.67 | 17.95 | 2.84 [2.71, 2.96] | 2.94 | -1.63 | -0.307 [-0.315, -0.300] |
+| 5 | 54.70 [53.47, 55.93] | 54.59 | 0.17 | 19.82 | 5.66 [5.44, 5.89] | 5.73 | -0.59 | -0.346 [-0.355, -0.338] |
+| 10 | 46.56 [44.85, 48.27] | 46.31 | 0.29 | 27.61 | 13.40 [12.96, 13.84] | 13.57 | -0.76 | -0.426 [-0.437, -0.415] |
+| 20 | 30.07 [27.16, 32.97] | 29.73 | 0.23 | 46.78 | 29.46 [28.64, 30.28] | 29.44 | 0.04 | -0.540 [-0.554, -0.526] |
+
+- C1 PASS: largest `|z|` for the mean is 0.67.
+- C2 PASS: mean P&L falls at every step of the grid, from 61.30 to 30.07.
+- C3 PASS: largest `|z|` for pick-offs is 1.63.
+- C4 PASS: the edge per pick-off is negative with a CI below 0 at every `m > 1`.
+- Share of steps at the inventory limit: 0 at every grid point.
 
 ## Decision
 
-Not run yet.
+**CONFIRMED.** All four pre-registered criteria hold.
+
+What the verdict does not say: the six grid points share one seed (the z-scores for the mean
+are all slightly positive for that reason); and "who picks off" in this model is the ordinary
+noise flow reacting to price, not a fast informed trader, so the pick-off is almost but not
+quite certain. Approved under delegation during an overnight run, not by Nick.
 
 ## What I learned
 
-Not run yet.
+About the model:
+
+- Latency has a price that can be read off the table: requoting every 5 steps instead of every
+  step costs 6.6 of 61.3 mean P&L (11%); every 20 steps costs half.
+- The loss is concentrated in a few fills. At `m = 5` about 5.7 of 85 fills per episode are
+  pick-offs, each losing 0.35 on average at the moment of the fill, while an ordinary fill
+  earns the half-spread 0.75.
+- Slow requoting gets *more* fills (80.6 at `m = 1`, 100.6 at `m = 20`), and the extra ones
+  are the bad ones. Fill count is not a measure of success.
+- P&L std rises from 17 to 47: stale quotes accumulate inventory in the direction of the
+  move, the worst time to hold it.
+- Without jumps the same formula gives 58.4 at `m = 5`: at short intervals jumps cause most of
+  the damage; at long intervals diffusion alone moves the value through the quote.
+
+What depends on the assumptions: the jump size and rate (invented), a market maker that
+requotes on a clock instead of cancelling on a signal, and noise flow as the only "sniper".

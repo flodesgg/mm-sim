@@ -83,3 +83,31 @@ run_id,started_utc,git_commit,config_hash,experiment,scenario,strategy,parameter
 20261109T213355Z-c3f5f0,2026-11-09T21:33:55+00:00,2c0240941c5c,92ddd4ad4197,EXP-002,toxic,fixed,"{""flow.informed.intensity"": 200.0, ""half_spread"": 0.75}",202,1000
 20261109T213355Z-c3f5f0,2026-11-09T21:33:55+00:00,2c0240941c5c,92ddd4ad4197,EXP-002,toxic,fixed,"{""flow.informed.intensity"": 200.0, ""half_spread"": 1.0}",202,1000
 20261109T213355Z-c3f5f0,2026-11-09T21:33:55+00:00,2c0240941c5c,92ddd4ad4197,EXP-002,toxic,fixed,"{""flow.informed.intensity"": 200.0, ""half_spread"": 1.5}",202,1000
+20261109T214532Z-6561a4,2026-11-09T21:45:32+00:00,741ba8fd1ee7,462cf8b0d9ce,EXP-003,inventory,avellaneda_stoikov,"{""gamma"": 0.01}",303,1000
+20261109T214532Z-6561a4,2026-11-09T21:45:32+00:00,741ba8fd1ee7,462cf8b0d9ce,EXP-003,inventory,fixed,"{""half_spread"": 0.6795085}",303,1000
+20261109T214532Z-6561a4,2026-11-09T21:45:32+00:00,741ba8fd1ee7,462cf8b0d9ce,EXP-003,inventory,avellaneda_stoikov,"{""gamma"": 0.05}",303,1000
+20261109T214532Z-6561a4,2026-11-09T21:45:32+00:00,741ba8fd1ee7,462cf8b0d9ce,EXP-003,inventory,fixed,"{""half_spread"": 0.711034175}",303,1000
+20261109T214532Z-6561a4,2026-11-09T21:45:32+00:00,741ba8fd1ee7,462cf8b0d9ce,EXP-003,inventory,avellaneda_stoikov,"{""gamma"": 0.1}",303,1000
+20261109T214532Z-6561a4,2026-11-09T21:45:32+00:00,741ba8fd1ee7,462cf8b0d9ce,EXP-003,inventory,fixed,"{""half_spread"": 0.7508886499999999}",303,1000
+20261109T214532Z-6561a4,2026-11-09T21:45:32+00:00,741ba8fd1ee7,462cf8b0d9ce,EXP-003,inventory,avellaneda_stoikov,"{""gamma"": 0.2}",303,1000
+20261109T214532Z-6561a4,2026-11-09T21:45:32+00:00,741ba8fd1ee7,462cf8b0d9ce,EXP-003,inventory,fixed,"{""half_spread"": 0.831810525}",303,1000
+20261109T214532Z-6561a4,2026-11-09T21:45:32+00:00,741ba8fd1ee7,462cf8b0d9ce,EXP-003,inventory,avellaneda_stoikov,"{""gamma"": 0.5}",303,1000
+20261109T214532Z-6561a4,2026-11-09T21:45:32+00:00,741ba8fd1ee7,462cf8b0d9ce,EXP-003,inventory,fixed,"{""half_spread"": 1.08286045}",303,1000
+20261109T214532Z-6561a4,2026-11-09T21:45:32+00:00,741ba8fd1ee7,462cf8b0d9ce,EXP-003,inventory,avellaneda_stoikov,"{""gamma"": 1.0}",303,1000
+20261109T214532Z-6561a4,2026-11-09T21:45:32+00:00,741ba8fd1ee7,462cf8b0d9ce,EXP-003,inventory,fixed,"{""half_spread"": 1.5208488750000002}",303,1000
+20261109T214532Z-6561a4,2026-11-09T21:45:32+00:00,741ba8fd1ee7,462cf8b0d9ce,EXP-003,inventory,skew,"{""half_spread"": 0.75, ""kappa"": 0.01}",303,1000
+20261109T214532Z-6561a4,2026-11-09T21:45:32+00:00,741ba8fd1ee7,462cf8b0d9ce,EXP-003,inventory,fixed,"{""half_spread"": 0.754975}",303,1000
+20261109T214532Z-6561a4,2026-11-09T21:45:32+00:00,741ba8fd1ee7,462cf8b0d9ce,EXP-003,inventory,skew,"{""half_spread"": 0.75, ""kappa"": 0.02}",303,1000
+20261109T214532Z-6561a4,2026-11-09T21:45:32+00:00,741ba8fd1ee7,462cf8b0d9ce,EXP-003,inventory,fixed,"{""half_spread"": 0.754975}",303,1000
+20261109T214532Z-6561a4,2026-11-09T21:45:32+00:00,741ba8fd1ee7,462cf8b0d9ce,EXP-003,inventory,skew,"{""half_spread"": 0.75, ""kappa"": 0.05}",303,1000
+20261109T214532Z-6561a4,2026-11-09T21:45:32+00:00,741ba8fd1ee7,462cf8b0d9ce,EXP-003,inventory,fixed,"{""half_spread"": 0.754975}",303,1000
+20261109T214532Z-6561a4,2026-11-09T21:45:32+00:00,741ba8fd1ee7,462cf8b0d9ce,EXP-003,inventory,skew,"{""half_spread"": 0.75, ""kappa"": 0.1}",303,1000
+20261109T214532Z-6561a4,2026-11-09T21:45:32+00:00,741ba8fd1ee7,462cf8b0d9ce,EXP-003,inventory,fixed,"{""half_spread"": 0.754975}",303,1000
+20261109T214532Z-6561a4,2026-11-09T21:45:32+00:00,741ba8fd1ee7,462cf8b0d9ce,EXP-003,inventory,skew,"{""half_spread"": 0.75, ""kappa"": 0.2}",303,1000
+20261109T214532Z-6561a4,2026-11-09T21:45:32+00:00,741ba8fd1ee7,462cf8b0d9ce,EXP-003,inventory,fixed,"{""half_spread"": 0.754975}",303,1000
+20261109T214608Z-0497ff,2026-11-09T21:46:08+00:00,741ba8fd1ee7,d1c8fe6df97e,EXP-004,jumpy,fixed,"{""engine.requote_every"": 1, ""half_spread"": 0.75}",404,1000
+20261109T214608Z-0497ff,2026-11-09T21:46:08+00:00,741ba8fd1ee7,d1c8fe6df97e,EXP-004,jumpy,fixed,"{""engine.requote_every"": 2, ""half_spread"": 0.75}",404,1000
+20261109T214608Z-0497ff,2026-11-09T21:46:08+00:00,741ba8fd1ee7,d1c8fe6df97e,EXP-004,jumpy,fixed,"{""engine.requote_every"": 3, ""half_spread"": 0.75}",404,1000
+20261109T214608Z-0497ff,2026-11-09T21:46:08+00:00,741ba8fd1ee7,d1c8fe6df97e,EXP-004,jumpy,fixed,"{""engine.requote_every"": 5, ""half_spread"": 0.75}",404,1000
+20261109T214608Z-0497ff,2026-11-09T21:46:08+00:00,741ba8fd1ee7,d1c8fe6df97e,EXP-004,jumpy,fixed,"{""engine.requote_every"": 10, ""half_spread"": 0.75}",404,1000
+20261109T214608Z-0497ff,2026-11-09T21:46:08+00:00,741ba8fd1ee7,d1c8fe6df97e,EXP-004,jumpy,fixed,"{""engine.requote_every"": 20, ""half_spread"": 0.75}",404,1000

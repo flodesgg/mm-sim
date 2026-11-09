@@ -1,0 +1,20 @@
+{
+  "run": {
+    "run_id": "20261109T214532Z-6561a4",
+    "started_utc": "2026-11-09T21:45:32+00:00",
+    "git_commit": "741ba8fd1ee7",
+    "git_dirty": false,
+    "config_hash": "462cf8b0d9ce",
+    "scenario": "inventory"
+  },
+  "experiment": "EXP-003",
+  "seed": 303,
+  "episodes": 1000,
+  "decision": "CONFIRMED",
+  "checks": {
+    "H1 std of liquidated P&L below the benchmark's (ratio CI below 1) for every AS gamma >= 0.1 and every skew kappa >= 0.05": true,
+    "H2 AS gamma = 0.1 cuts the std by at least 25% (ratio CI below 0.75)": true,
+    "H3 AS gamma = 0.1 costs at most 15% of the benchmark's mean liquidated P&L (paired CI)": true,
+    "H4 AS gamma = 0.1 has a higher certainty equivalent than its benchmark (difference CI above 0)": true
+  }
+}
