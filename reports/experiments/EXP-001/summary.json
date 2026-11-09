@@ -28,10 +28,10 @@
   },
   "reproduction": {
     "run": {
-      "run_id": "20261109T215620Z-265f81",
-      "started_utc": "2026-11-09T21:56:20+00:00",
-      "git_commit": "78f2f77fe3a0",
-      "git_dirty": false,
+      "run_id": "20261109T221939Z-a35e02",
+      "started_utc": "2026-11-09T22:19:39+00:00",
+      "git_commit": "47b3d702865b",
+      "git_dirty": true,
       "config_hash": "fbe6c4ea5f6c",
       "scenario": "baseline"
     },
@@ -51,6 +51,10 @@
       "std_ratio",
       "fills_per_episode",
       "theory_fills",
+      "spread_capture",
+      "adverse_selection",
+      "inventory_pnl",
+      "fees",
       "share_at_limit"
     ],
     "largest_relative_difference": 0.0

@@ -1,0 +1,17 @@
+{
+  "run": {
+    "run_id": "20261109T221439Z-5bf9ee",
+    "started_utc": "2026-11-09T22:14:39+00:00",
+    "git_commit": "47b3d702865b",
+    "git_dirty": false,
+    "config_hash": "fbe6c4ea5f6c",
+    "scenario": "benchmark"
+  },
+  "episodes": 1000,
+  "repeats": 3,
+  "machine": "arm64",
+  "processor": "arm",
+  "system": "Darwin 27.2.0",
+  "python": "3.13.15",
+  "numpy": "2.5.4"
+}

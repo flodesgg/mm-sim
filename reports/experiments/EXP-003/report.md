@@ -17,9 +17,9 @@ Specific to this experiment: noise traders only (no informed flow, no jumps). Th
 ## Setup
 
 - scenario: `inventory`, config hash `462cf8b0d9ce`
-- run id `20261109T215838Z-3abba1`, git commit `78f2f77fe3a0` (uncommitted changes)
+- run id `20261109T214532Z-6561a4`, git commit `741ba8fd1ee7`
 - root seed 303, 1000 episodes
-- variants tried so far in this repository (lines in `experiments/trial_log.csv`): 116
+- variants tried so far in this repository (lines in `experiments/trial_log.csv`): 157
 - grids `{"gamma": [0.01, 0.05, 0.1, 0.2, 0.5, 1.0], "kappa": [0.01, 0.02, 0.05, 0.1, 0.2]}`; each variant is paired with `fixed` at half its average quoted spread, on the same seed (common random numbers)
 - pre-registered as EXP-003, approved by delegation during an overnight run on 2026-11-09
 - certainty equivalent with risk aversion 0.1; std-ratio and CE intervals by paired bootstrap over episodes (2000 resamples)

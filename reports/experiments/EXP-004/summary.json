@@ -27,9 +27,9 @@
   },
   "reproduction": {
     "run": {
-      "run_id": "20261109T215912Z-134c11",
-      "started_utc": "2026-11-09T21:59:12+00:00",
-      "git_commit": "78f2f77fe3a0",
+      "run_id": "20261109T222221Z-920712",
+      "started_utc": "2026-11-09T22:22:21+00:00",
+      "git_commit": "47b3d702865b",
       "git_dirty": true,
       "config_hash": "d1c8fe6df97e",
       "scenario": "jumpy"
@@ -53,6 +53,9 @@
       "edge_ci_high",
       "fills",
       "spread_capture",
+      "adverse_selection",
+      "inventory_pnl",
+      "fees",
       "share_at_limit"
     ],
     "largest_relative_difference": 0.0

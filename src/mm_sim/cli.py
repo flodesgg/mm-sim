@@ -160,7 +160,9 @@ def cmd_reproduce(args: argparse.Namespace) -> int:
     scratch = out_dir.with_name(f"{exp.id}.reproduce")
     if scratch.exists():
         shutil.rmtree(scratch)
-    decision = kind.run(cfg, exp, info, scratch, log=False)
+    # the rebuilt report cites the original run; the reproduction is recorded in summary.json
+    original = RunInfo(**old_summary.get("original_run", old_summary["run"]))
+    decision = kind.run(cfg, exp, original, scratch, log=False)
     fresh = pd.read_csv(scratch / kind.TABLE_FILE)
     shared = [c for c in stored.columns if c in fresh.columns]
     numeric = [c for c in shared if pd.api.types.is_numeric_dtype(stored[c])]

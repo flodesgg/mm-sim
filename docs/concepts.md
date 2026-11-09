@@ -192,3 +192,13 @@ quotes after every trade in the direction of the trade, and narrow the spread as
 **Marking to the last trade.** During the game P&L is valued at the last trade price, because
 the true value is unknown. It can look fine while you are being run over: buying all the way
 down marks each purchase at the newest, lower price only after the next trade.
+
+## Stage F
+
+**Reference implementation and test oracle.** A slow, obviously-correct version is kept as the
+specification, and the fast version must reproduce its output on the same inputs. Speed is
+then never bought with a silent change of behaviour.
+
+**Vectorisation.** Replacing a Python loop over episodes by numpy operations on whole arrays.
+The loop over time steps stays, because each step depends on the previous one; the episodes
+are independent, so they can be advanced together.

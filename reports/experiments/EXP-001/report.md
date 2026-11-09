@@ -16,10 +16,10 @@ This experiment has noise traders only: no informed flow, no jumps, no latency, 
 
 ## Setup
 
-- scenario: `baseline`, config hash `fbe6c4ea5f6c`
-- run id `20261109T215620Z-265f81`, git commit `78f2f77fe3a0`
+- scenario: `baseline`, config hash `98f30782c37f`
+- run id `20261109T212048Z-f0ee9c`, git commit `6c91285cc39c`
 - root seed 101, 1000 episodes
-- variants tried so far in this repository (lines in `experiments/trial_log.csv`): 116
+- variants tried so far in this repository (lines in `experiments/trial_log.csv`): 157
 - strategy `fixed`, grid `{"half_spread": [0.1, 0.25, 0.4, 0.55, 0.7, 0.85, 1.0, 1.25, 1.5, 2.0]}`; every grid point uses the same seed (common random numbers)
 - pre-registered in `experiments/` as EXP-001, approved by Nick on 2026-11-09
 

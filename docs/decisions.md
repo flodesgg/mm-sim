@@ -121,3 +121,18 @@ One line per decision or bug fix, newest last. Format: date — decision — rea
   difficulty levels.
 - 2026-11-09 — `play` settings (`time_limit_sec`) are a config section outside the model hash —
   they cannot change a simulation result.
+- 2026-11-09 — The fast engine vectorises over episodes with numpy and keeps one stream per
+  (episode, component) — it then draws exactly the reference engine's random numbers and its
+  results can be required to be equal, not merely statistically similar. Cost: the speed-up is
+  13 to 28 times, not hundreds.
+- 2026-11-09 — The fast engine covers the public-mid world and the three closed-form
+  strategies only; two-point world, Glosten–Milgrom, play mode and the kill switch stay on the
+  reference engine — vectorising a stateful Bayesian strategy and a human adds code for no
+  need. All experiments ran on the reference engine.
+- 2026-11-09 — "Identical" between the engines means: every fill count exactly equal, floats
+  equal to 1e-9 — numpy and the math module may round `exp` and decimal rounding differently
+  in the last bit, so bitwise equality of P&L is not promised.
+- 2026-11-09 — A reproduced report cites the original run id and commit; the reproduction's
+  own run is recorded in `summary.json` — `make figures` then leaves reports unchanged.
+- 2026-11-09 — Theory functions use `math.erfc`/`math.exp` instead of `scipy.stats.norm` —
+  several times faster; `make figures` confirmed that every stored theory value is unchanged.

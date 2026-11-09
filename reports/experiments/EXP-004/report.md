@@ -17,9 +17,9 @@ Specific to this experiment: jumps of size 1 (fixed) arrive at rate 5 per unit t
 ## Setup
 
 - scenario: `jumpy`, config hash `d1c8fe6df97e`
-- run id `20261109T215912Z-134c11`, git commit `78f2f77fe3a0` (uncommitted changes)
+- run id `20261109T214608Z-0497ff`, git commit `741ba8fd1ee7` (uncommitted changes)
 - root seed 404, 1000 episodes
-- variants tried so far in this repository (lines in `experiments/trial_log.csv`): 116
+- variants tried so far in this repository (lines in `experiments/trial_log.csv`): 157
 - strategy `fixed` (half-spread from the config), `{"engine.requote_every": [1.0, 2.0, 3.0, 5.0, 10.0, 20.0]}`; every grid point uses the same seed
 - pre-registered as EXP-004, approved by delegation during an overnight run on 2026-11-09
 

@@ -27,9 +27,9 @@
   },
   "reproduction": {
     "run": {
-      "run_id": "20261109T215636Z-a82da5",
-      "started_utc": "2026-11-09T21:56:36+00:00",
-      "git_commit": "78f2f77fe3a0",
+      "run_id": "20261109T221952Z-961193",
+      "started_utc": "2026-11-09T22:19:52+00:00",
+      "git_commit": "47b3d702865b",
       "git_dirty": true,
       "config_hash": "ebc690a89178",
       "scenario": "toxic"
@@ -49,6 +49,7 @@
       "inventory_pnl",
       "fills_noise",
       "fills_informed",
+      "fees",
       "share_at_limit"
     ],
     "largest_relative_difference": 0.0
