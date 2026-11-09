@@ -1,4 +1,4 @@
-.PHONY: check check-all lint typecheck test test-all fmt
+.PHONY: check check-all lint typecheck test test-all fmt figures benchmark
 
 # Fast gate, run after every stage. Look at its real exit code: never pipe it into tail/head.
 check: lint typecheck test
@@ -22,3 +22,11 @@ test-all:
 fmt:
 	uv run ruff format src tests
 	uv run ruff check --fix src tests
+
+# Rebuild every experiment report and figure from scratch (same seeds), and fail if any
+# stored number does not reproduce.
+figures:
+	uv run mm-sim reproduce all
+
+benchmark:
+	uv run mm-sim benchmark

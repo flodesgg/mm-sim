@@ -2,20 +2,22 @@
 
 Commands
   check-config [--scenario X]   validate config.yaml (+ scenario) and print it with its hash
-  run --scenario X --strategy S [--episodes N] [--seed K]
+  run --scenario X --strategy S [--episodes N] [--seed K] [--engine fast]
                                 Monte Carlo run -> reports/runs/<run_id>/
   experiment EXP-NNN            run an approved, pre-registered experiment (once)
   play --scenario two_point_easy [--seed K]
                                 the interactive quoting game; saved under play/
   play-stats                    table and plot of the saved games
-  reproduce EXP-NNN             rebuild a finished experiment's report and figures from
+  reproduce EXP-NNN | all       rebuild a finished experiment's report and figures from
                                 scratch and verify the numbers against the stored ones
+  benchmark                     steps per second of the reference and the fast engine
 """
 
 from __future__ import annotations
 
 import argparse
 import json
+import platform
 import shutil
 import sys
 from datetime import UTC, datetime
@@ -36,6 +38,7 @@ from mm_sim.analysis import (
     exp_latency,
     exp_robustness,
 )
+from mm_sim.analysis.benchmark import benchmark_pair
 from mm_sim.analysis.experiment import (
     Experiment,
     ExperimentError,
@@ -46,6 +49,7 @@ from mm_sim.analysis.experiment import (
 from mm_sim.analysis.montecarlo import run_monte_carlo, with_run_settings
 from mm_sim.analysis.trials import append_trial, count_trials
 from mm_sim.config import DEFAULT_CONFIG_PATH, Config, available_scenarios, load_config
+from mm_sim.engine import fast
 from mm_sim.logging_setup import setup_logging
 from mm_sim.play.game import GameAborted, run_game
 from mm_sim.play.history import load_history, progress_figure, save_game, stats_table
@@ -87,7 +91,15 @@ def cmd_run(args: argparse.Namespace) -> int:
     cfg, info = _start(args)
     cfg = with_run_settings(cfg, args.seed, args.episodes)
     strategy, params = build_strategy(cfg, args.strategy)
-    episodes = run_monte_carlo(cfg, strategy)
+    if args.engine == "fast":
+        if not fast.supports(cfg, args.strategy):
+            raise ValueError(
+                "the fast engine covers fixed, skew and avellaneda_stoikov in the public_mid "
+                "world without a kill switch; use --engine reference"
+            )
+        episodes = fast.run_monte_carlo_fast(cfg, args.strategy)
+    else:
+        episodes = run_monte_carlo(cfg, strategy)
     a = cfg.analysis
     append_trial(cfg.paths.experiments, info, "", args.strategy, params, a.seed, a.episodes)
     out_dir = cfg.paths.reports / "runs" / info.run_id
@@ -131,6 +143,15 @@ def cmd_reproduce(args: argparse.Namespace) -> int:
     """Rebuild a finished experiment's report and figures from scratch and check that the
     numbers are the stored ones. Same seed, same grid: a reproduction, not a new trial, so
     nothing is added to the trial log."""
+    if args.id == "all":
+        base, _ = load_config(args.config)
+        codes = []
+        for path in sorted(base.paths.experiments.glob("EXP-*.md")):
+            if "template" in path.name or load_experiment(path).status != "done":
+                continue
+            args.id = path.name[:7]
+            codes.append(cmd_reproduce(args))
+        return max(codes, default=0)
     cfg, info, exp, kind, out_dir = _experiment_setup(args)
     if exp.status != "done" or not out_dir.is_dir():
         raise ExperimentError(f"{exp.id} has not run yet; `reproduce` is for finished experiments")
@@ -204,6 +225,41 @@ def cmd_play_stats(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_benchmark(args: argparse.Namespace) -> int:
+    """Time both engines on every public-mid scenario and check that they agree."""
+    rows = []
+    info: RunInfo | None = None
+    for scenario in available_scenarios(args.config):
+        cfg, chash = load_config(args.config, scenario)
+        if cfg.market.world != "public_mid":
+            continue
+        info = info or new_run_info(chash, "benchmark")
+        cfg = with_run_settings(cfg, cfg.analysis.seed, args.episodes)
+        for name in fast.FAST_STRATEGIES:
+            rows.append(
+                {"scenario": scenario, "strategy": name, **benchmark_pair(cfg, name, args.repeats)}
+            )
+    table = pd.DataFrame(rows)
+    assert info is not None
+    out_dir = load_config(args.config)[0].paths.reports / "benchmark"
+    out_dir.mkdir(parents=True, exist_ok=True)
+    table.to_csv(out_dir / "benchmark.csv", index=False, float_format="%.6g")
+    meta = {
+        "run": info.as_dict(),
+        "episodes": args.episodes,
+        "repeats": args.repeats,
+        "machine": platform.machine(),
+        "processor": platform.processor(),
+        "system": f"{platform.system()} {platform.release()}",
+        "python": platform.python_version(),
+        "numpy": np.__version__,
+    }
+    (out_dir / "benchmark.json").write_text(json.dumps(meta, indent=2) + "\n")
+    print(table.round(4).to_string(index=False))
+    print(f"written: {out_dir / 'benchmark.csv'}")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="mm-sim", description=__doc__.splitlines()[0])
     parser.add_argument("--version", action="version", version=f"mm-sim {__version__}")
@@ -222,6 +278,12 @@ def build_parser() -> argparse.ArgumentParser:
     p_run.add_argument("--strategy", required=True, choices=sorted(REGISTRY))
     p_run.add_argument("--episodes", type=int, default=None, help="default: analysis.episodes")
     p_run.add_argument("--seed", type=int, default=None, help="default: analysis.seed")
+    p_run.add_argument(
+        "--engine",
+        choices=["reference", "fast"],
+        default="reference",
+        help="reference = the readable source of truth; fast = vectorised, same results",
+    )
     p_run.set_defaults(func=cmd_run)
 
     p_exp = sub.add_parser("experiment", help="run an approved pre-registered experiment")
@@ -239,9 +301,15 @@ def build_parser() -> argparse.ArgumentParser:
     p_stats.set_defaults(func=cmd_play_stats)
 
     p_rep = sub.add_parser("reproduce", help="rebuild a finished experiment and verify it")
-    p_rep.add_argument("id", help="for example EXP-001")
+    p_rep.add_argument("id", help="for example EXP-001, or 'all' for every finished experiment")
     p_rep.add_argument("--config", type=Path, default=DEFAULT_CONFIG_PATH)
     p_rep.set_defaults(func=cmd_reproduce)
+
+    p_bench = sub.add_parser("benchmark", help="steps per second of both engines")
+    p_bench.add_argument("--config", type=Path, default=DEFAULT_CONFIG_PATH)
+    p_bench.add_argument("--episodes", type=int, default=1000)
+    p_bench.add_argument("--repeats", type=int, default=3)
+    p_bench.set_defaults(func=cmd_benchmark)
     return parser
 
 
