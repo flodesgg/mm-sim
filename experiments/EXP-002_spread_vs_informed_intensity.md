@@ -1,9 +1,9 @@
 ---
 id: EXP-002
 title: "Fixed half-spread against informed flow: mean P&L heatmap and break-even line"
-status: draft            # draft | approved | done
-approved_by: null        # Nick
-approved_on: null        # YYYY-MM-DD
+status: approved         # draft | approved | done
+approved_by: "delegation during an overnight run"  # Nick, 2026-11-09, delegated the build overnight; not reviewed by Nick before the run
+approved_on: 2026-11-09
 scenario: "toxic"
 config_hash: "92ddd4ad4197"
 decision: null           # CONFIRMED | REJECTED | INCONCLUSIVE

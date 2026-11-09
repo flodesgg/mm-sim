@@ -64,3 +64,9 @@ One line per decision or bug fix, newest last. Format: date — decision — rea
   fixture was not regenerated.
 - 2026-11-09 — `clairvoyant` is not in the strategy registry — the CLI and experiments cannot
   run it; only tests construct it.
+- 2026-11-09 — **Delegation.** Nick left the build running overnight ("продолжай делать все
+  сам, оставляю тебя на ночь"). From EXP-002 on, experiments are approved under that delegation,
+  not by Nick, and say so in `approved_by`; model choices that were Nick's to make are made
+  under the same delegation and marked "(delegated)" below. Unchanged: each experiment is
+  written and committed before it runs, runs once, and the hard constraints of the build
+  prompt hold (simulation only, repo private, Stage G not started).
