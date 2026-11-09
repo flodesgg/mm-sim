@@ -21,7 +21,7 @@ SCENARIO_DIR = "scenarios"  # next to the base config file
 _YAML_BOOL_HINT = "YAML reads bare yes/no/on/off/true/false as booleans; put the value in quotes"
 
 
-class _Strict(BaseModel):
+class StrictModel(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
     @model_validator(mode="before")
@@ -39,7 +39,7 @@ class _Strict(BaseModel):
         return data
 
 
-class ProjectConfig(_Strict):
+class ProjectConfig(StrictModel):
     name: str
     simulation_only: bool
 
@@ -51,26 +51,26 @@ class ProjectConfig(_Strict):
         return v
 
 
-class ScenarioInfo(_Strict):
+class ScenarioInfo(StrictModel):
     name: str = Field(pattern=r"^[a-z0-9_]+$")
     description: str
 
 
-class PathsConfig(_Strict):
+class PathsConfig(StrictModel):
     reports: Path
     experiments: Path
     logs: Path
     play: Path
 
 
-class LoggingConfig(_Strict):
+class LoggingConfig(StrictModel):
     level: Literal["DEBUG", "INFO", "WARNING", "ERROR"] = "INFO"
     file: str = "mm_sim.log"
     max_bytes: int = Field(gt=0)
     backup_count: int = Field(ge=0)
 
 
-class JumpConfig(_Strict):
+class JumpConfig(StrictModel):
     """Used only by the jump_diffusion process: a jump with probability intensity*dt per step."""
 
     intensity: float = Field(ge=0)  # lambda_J, jumps per unit of time
@@ -78,7 +78,7 @@ class JumpConfig(_Strict):
     size_dist: Literal["fixed", "normal"]
 
 
-class TwoPointConfig(_Strict):
+class TwoPointConfig(StrictModel):
     """Used only by the two_point process: V = v_high with probability p_high, else v_low."""
 
     v_high: float
@@ -92,7 +92,7 @@ class TwoPointConfig(_Strict):
         return self
 
 
-class MarketConfig(_Strict):
+class MarketConfig(StrictModel):
     process: Literal["random_walk", "jump_diffusion", "two_point"]
     world: Literal["public_mid", "trades_only"]  # what the market maker observes
     s0: float = Field(gt=0)  # initial value V_0
@@ -119,30 +119,30 @@ class MarketConfig(_Strict):
         return self
 
 
-class NoiseFlowConfig(_Strict):
+class NoiseFlowConfig(StrictModel):
     """A side at distance d from the mid fills with probability 1 - exp(-A*exp(-k*d)*dt)."""
 
     A: float = Field(ge=0)
     k: float = Field(gt=0)
 
 
-class InformedFlowConfig(_Strict):
+class InformedFlowConfig(StrictModel):
     intensity: float = Field(ge=0)  # lambda_I, arrivals per unit of time
     horizon_steps: int = Field(ge=1)  # the informed trader knows V at t + horizon_steps
     threshold: float = Field(ge=0)  # c_I: minimum edge before it trades
 
 
-class GlostenMilgromFlowConfig(_Strict):
+class GlostenMilgromFlowConfig(StrictModel):
     mu: float = Field(ge=0, le=1)  # probability that the arriving trader is informed
 
 
-class FlowConfig(_Strict):
+class FlowConfig(StrictModel):
     noise: NoiseFlowConfig
     informed: InformedFlowConfig
     glosten_milgrom: GlostenMilgromFlowConfig
 
 
-class EngineConfig(_Strict):
+class EngineConfig(StrictModel):
     requote_every: int = Field(ge=1)  # the strategy requotes every this many steps (latency)
     q_max: int = Field(ge=1)  # inventory limit in lots, enforced by the engine
     maker_fee: float  # per lot; negative = rebate
@@ -151,7 +151,7 @@ class EngineConfig(_Strict):
     liq_impact: float = Field(ge=0)  # extra cost per lot, per lot of final inventory
 
 
-class AccountingConfig(_Strict):
+class AccountingConfig(StrictModel):
     markout_horizon_steps: int = Field(ge=1)  # h in the P&L decomposition
     markout_curve_horizons: list[int] = Field(min_length=1)
 
@@ -163,7 +163,7 @@ class AccountingConfig(_Strict):
         return v
 
 
-class AnalysisConfig(_Strict):
+class AnalysisConfig(StrictModel):
     episodes: int = Field(ge=1)
     seed: int = Field(ge=0)  # root seed; every episode and component gets a spawned stream
     ci_level: float = Field(gt=0.5, lt=1)
@@ -174,7 +174,7 @@ class AnalysisConfig(_Strict):
 MODEL_SECTIONS = ("market", "flow", "engine", "accounting", "strategies", "analysis")
 
 
-class Config(_Strict):
+class Config(StrictModel):
     project: ProjectConfig
     scenario: ScenarioInfo
     paths: PathsConfig

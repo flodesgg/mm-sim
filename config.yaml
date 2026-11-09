@@ -65,7 +65,9 @@ accounting:
   markout_horizon_steps: 10   # h in the P&L decomposition (separate from informed.horizon_steps)
   markout_curve_horizons: [0, 1, 2, 5, 10, 20, 50]
 
-strategies: {}                # filled stage by stage; each strategy validates its own block
+strategies:                   # each strategy validates its own block (src/mm_sim/strategies/)
+  fixed:
+    half_spread: 0.75         # h: bid = s - h, ask = s + h
 
 analysis:
   episodes: 1000

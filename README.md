@@ -9,8 +9,9 @@ conclusion in this repository is a conclusion about the model, not about real ma
 
 ## Status
 
-Stage 0 (skeleton) is done: configuration, run metadata, logging and the quality gate. There
-is no simulator yet and therefore **no results**. See [STATUS.md](STATUS.md) for the roadmap.
+Stage A is done: a reference engine with noise traders and a fixed-spread strategy, exact P&L
+accounting, a Monte Carlo runner and reports. The first pre-registered experiment (EXP-001) is
+written and not yet run, so there are **no headline results yet**. See [STATUS.md](STATUS.md).
 
 ## Questions the lab will answer (with plots and confidence intervals)
 
@@ -36,6 +37,9 @@ is no simulator yet and therefore **no results**. See [STATUS.md](STATUS.md) for
 uv sync                                        # Python 3.13 environment from the lockfile
 make check                                     # ruff, mypy --strict, fast tests
 uv run mm-sim check-config --scenario baseline # print the validated config and its hash
+uv run mm-sim run --scenario baseline --strategy fixed --episodes 1000 --seed 1
+                                               # -> reports/runs/<run_id>/report.md
+uv run mm-sim experiment EXP-001               # runs only if approved and the config hash matches
 ```
 
 ## Layout
@@ -43,7 +47,8 @@ uv run mm-sim check-config --scenario baseline # print the validated config and 
 | Path | Content |
 |---|---|
 | `config.yaml`, `scenarios/` | all parameters; scenarios override the base config |
-| `src/mm_sim/` | `config`, `runinfo`, `logging_setup`, `cli`; model packages are filled stage by stage |
+| `src/mm_sim/engine/reference.py` | the reference engine: one episode, step by step (start reading here) |
+| `src/mm_sim/` | `market/`, `flow/`, `strategies/`, `accounting/`, `analysis/`, `reports/`, `cli` |
 | `tests/` | pytest + hypothesis |
 | `experiments/` | pre-registered experiments and the trial log |
 | `reports/` | generated reports and figures |

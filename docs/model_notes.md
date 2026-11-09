@@ -55,7 +55,17 @@ side fills at most once per step.
 4. The value moves to `V_{t+1}`.
 
 Quotes are rounded to the tick grid outwards (bid down, ask up), so rounding never narrows
-the spread.
+the spread. A price within 1e-9 ticks of a grid point counts as on the grid.
+
+Details fixed by the reference engine (`src/mm_sim/engine/reference.py`) and pinned by the
+hand-computed test `tests/test_engine_steps.py`:
+
+- A fill at step `t` happens at the quote standing in step `t`, while the value is `V_t`.
+- A side at the inventory limit at the start of a step is closed for the whole step.
+- The kill switch is checked at the start of a step, on `cash + q·V_t`.
+- The trade tape records the trader's side: `+1` the trader bought (ask lifted), `−1` sold.
+- Noise fills use one uniform draw per step and side, drawn before the episode. The draws do
+  not depend on the quotes, so two strategies on one seed face the same traders.
 
 ## 5. Positions, limits, end of episode
 
@@ -87,6 +97,39 @@ add up to the mark-to-market P&L exactly. It is tested in Stage A.
 - `glosten_milgrom`: Bayesian posterior on `V = V_H` from the trade tape; the ask is the
   expected value given that the next trade is a buy, the bid given a sell.
 - `clairvoyant`: test-only negative control that sees the future through a test hook.
+
+## 9. Fixed spread against noise flow: mean and std of P&L (derived here, tested)
+
+Assumptions: `fixed` strategy with half-spread `h`, noise traders only, requote every step, no
+fees, inventory limit not binding.
+
+**Mean.** In one step the ask at distance `δ` is lifted with probability
+`p(δ) = 1 − exp(−A·exp(−k·δ)·dt)` and then earns `δ` against the current value; the same for
+the bid. The value is a martingale and its moves are independent of the fills, so inventory
+earns zero on average. Summing `N` steps and two sides:
+
+```
+E[P&L] = N · 2 · δ · p(δ)
+```
+
+Outward rounding from a continuous mid makes `δ = h + U` with `U` roughly uniform on
+`[0, tick)`, so the prediction averages over `U`. For `A·dt → 0`, `p(δ) ≈ A·exp(−k·δ)·dt` and
+`δ·exp(−k·δ)` is maximal at `δ = 1/k`. For the baseline `A·dt = 0.7` the exact maximiser is
+wider than `1/k`.
+
+**Variance.** Write the P&L as spread capture plus the P&L of carried inventory:
+
+- Spread capture is a sum of `2N` independent terms `δ·Bernoulli(p)`:
+  variance `N·2·δ²·p·(1−p)`.
+- Inventory after the fills of step `t` is `Q_t`, a sum of `t+1` independent net fills
+  (`+1` with probability `p`, `−1` with probability `p`, both possible), each with variance
+  `2p(1−p)`. It then earns `Q_t·(V_{t+1} − V_t)`. The value steps are independent with
+  variance `σ²·dt`, so the variance is `σ²·dt · Σ_t E[Q_t²] = σ²·dt·2p(1−p)·N(N+1)/2`.
+- The two parts are uncorrelated (value steps have mean zero and are independent of fills).
+
+Code: `src/mm_sim/analysis/theory.py`. Tests: `tests/test_montecarlo.py`
+(`test_simulated_mean_and_std_match_the_closed_form`, `test_theory_closed_form_without_tick`,
+`test_optimal_half_spread_tends_to_one_over_k_for_small_dt`). The full check is EXP-001.
 
 ## 8. References and what was checked
 

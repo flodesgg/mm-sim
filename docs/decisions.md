@@ -20,3 +20,20 @@ One line per decision or bug fix, newest last. Format: date — decision — rea
   are excluded — the hash must change exactly when simulation results can change.
 - 2026-11-09 — Strategy parameters are a free mapping in the root schema and are validated by
   each strategy's own schema — adding a strategy stays a one-file job.
+- 2026-11-09 — A side at the inventory limit at the start of a step is closed for the whole
+  step (instead of checking fill by fill) — `|q| <= q_max` then holds whatever the order of
+  fills, and the rule is one sentence.
+- 2026-11-09 — Noise fills use uniform draws fixed before the episode, one per step and side —
+  gives common random numbers across strategies and makes "a wider quote never gets more
+  fills" an exact property.
+- 2026-11-09 — The config hash covers the scenario only; the root seed and episode count of a
+  run are recorded next to it in every output — `--seed`/`--episodes` on the command line
+  must not make the hash differ from what `check-config` prints and experiments pin.
+- 2026-11-09 — EXP-001's theory averages the closed form over the tick offset
+  (`delta = h + U`, `U ~ Uniform[0, tick)`) — follows the earlier decision to compare against
+  actual rounded distances.
+- 2026-11-09 — EXP-001 states the optimum as `h* = 0.744`, not `1/k = 0.667` — `A*dt = 0.7`
+  is not small in the baseline, so the small-dt approximation in the build prompt is off by
+  about 12%; the exact maximiser of the same formula is used.
+- 2026-11-09 — Experiments run on a seed never used while building (EXP-001: 101) — the
+  stage's acceptance run at seed 1 shows one point of the curve before pre-registration.
