@@ -88,3 +88,20 @@ One line per decision or bug fix, newest last. Format: date — decision — rea
 - 2026-11-09 — `fixed`, `skew` and `avellaneda_stoikov` pull the side that would breach the
   inventory limit — the build prompt asks strategies to do so; fills are unchanged because the
   engine enforced the limit already.
+- 2026-11-09 — `mm-sim reproduce` reruns a finished experiment on its own seed and grid,
+  requires the regenerated table to equal the stored one, and adds nothing to the trial log —
+  "run once" forbids re-rolling an experiment with new choices; a deterministic rebuild that
+  must give the same numbers is a check, not a new trial. The pinned config hash may differ by
+  then (strategies were added to `config.yaml`); equality of the numbers is the stronger test.
+- 2026-11-09 — Experiment reports gained a "representative grid point" section (decomposition,
+  markouts, inventory histogram, example episode); EXP-001..004 were rebuilt with `reproduce`
+  to get it, numbers identical to the original runs.
+- 2026-11-09 — SUSPICIOUS thresholds: Glosten–Milgrom is flagged at |mean| > 4 standard errors
+  (a 95% CI excludes zero in 5% of honest runs, which would cry wolf); profit below break-even
+  uses EXP-002's margin 0.05; the clairvoyant control quotes the strategy's average
+  half-spread and is compared on 200 paired episodes.
+- 2026-11-09 — (delegated) Robustness is a pre-registered experiment (EXP-005), not an ad-hoc
+  script, with variants `sigma = 4`, `k = 3`, jumps of 1.0 at rate 5 — it compares strategies,
+  so the build prompt's rule applies; variant values are invented.
+- 2026-11-09 — Kind-specific experiment settings live in the experiment file's `settings`
+  block — robustness variants are parameters and must not be hard-coded.

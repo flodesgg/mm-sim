@@ -1,0 +1,25 @@
+conclusion,description,variant,estimate,ci_low,ci_high,expected_sign,status,optimal_half_spread
+K1a,fixed at h* earns more than at h*/f (P&L difference),base,21.98519928,21.27732431,22.69307426,1,holds,0.7486745106
+K1b,fixed at h* earns more than at h*·f (P&L difference),base,39.41862718,38.58799206,40.24926229,1,holds,0.7486745106
+K2,narrow fixed spread against informed flow loses (mean P&L),base,-21.63762744,-23.88935109,-19.38590379,-1,holds,0.7486745106
+K3a,Avellaneda-Stoikov std below fixed at the same spread (std ratio - 1),base,-0.5533336692,-0.5881826769,-0.513145538,-1,holds,0.7486745106
+K3b,skew std below fixed at the same spread (std ratio - 1),base,-0.4725820119,-0.5121230041,-0.4298920554,-1,holds,0.7486745106
+K4,slow requoting earns less than requoting every step (P&L difference),base,-2.61959812,-3.079510116,-2.159686124,-1,holds,0.7486745106
+K1a,fixed at h* earns more than at h*/f (P&L difference),sigma_high,21.52497709,20.21557764,22.83437654,1,holds,0.7486745106
+K1b,fixed at h* earns more than at h*·f (P&L difference),sigma_high,39.39153246,37.94703696,40.83602796,1,holds,0.7486745106
+K2,narrow fixed spread against informed flow loses (mean P&L),sigma_high,-68.48145122,-72.99414458,-63.96875787,-1,holds,0.7486745106
+K3a,Avellaneda-Stoikov std below fixed at the same spread (std ratio - 1),sigma_high,-0.6867992714,-0.7119101383,-0.6588468126,-1,holds,0.7486745106
+K3b,skew std below fixed at the same spread (std ratio - 1),sigma_high,-0.5498102201,-0.5838923153,-0.5134173534,-1,holds,0.7486745106
+K4,slow requoting earns less than requoting every step (P&L difference),sigma_high,-11.26057942,-12.63724756,-9.883911284,-1,holds,0.7486745106
+K1a,fixed at h* earns more than at h*/f (P&L difference),k_high,10.55414409,9.895339609,11.21294858,1,holds,0.3743372591
+K1b,fixed at h* earns more than at h*·f (P&L difference),k_high,19.76089492,19.03604101,20.48574883,1,holds,0.3743372591
+K2,narrow fixed spread against informed flow loses (mean P&L),k_high,-27.6747187,-30.12898179,-25.22045562,-1,holds,0.3743372591
+K3a,Avellaneda-Stoikov std below fixed at the same spread (std ratio - 1),k_high,-0.7032608078,-0.7289182437,-0.674171239,-1,holds,0.3743372591
+K3b,skew std below fixed at the same spread (std ratio - 1),k_high,-0.6670006206,-0.6969521479,-0.6330166245,-1,holds,0.3743372591
+K4,slow requoting earns less than requoting every step (P&L difference),k_high,-5.552370244,-6.23437708,-4.870363408,-1,holds,0.3743372591
+K1a,fixed at h* earns more than at h*/f (P&L difference),jumps,23.09119928,22.0060935,24.17630506,1,holds,0.7486745106
+K1b,fixed at h* earns more than at h*·f (P&L difference),jumps,39.84562718,38.67373799,41.01751636,1,holds,0.7486745106
+K2,narrow fixed spread against informed flow loses (mean P&L),jumps,-48.9118506,-52.53567322,-45.28802798,-1,holds,0.7486745106
+K3a,Avellaneda-Stoikov std below fixed at the same spread (std ratio - 1),jumps,-0.6471734377,-0.671681057,-0.6200125616,-1,holds,0.7486745106
+K3b,skew std below fixed at the same spread (std ratio - 1),jumps,-0.5429721259,-0.5721086128,-0.5123699661,-1,holds,0.7486745106
+K4,slow requoting earns less than requoting every step (P&L difference),jumps,-6.626736522,-7.479355032,-5.774118012,-1,holds,0.7486745106

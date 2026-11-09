@@ -1,0 +1,30 @@
+{
+  "run": {
+    "run_id": "20261109T220045Z-da3d7c",
+    "started_utc": "2026-11-09T22:00:45+00:00",
+    "git_commit": "c119b9766964",
+    "git_dirty": false,
+    "config_hash": "fbe6c4ea5f6c",
+    "scenario": "baseline"
+  },
+  "experiment": "EXP-005",
+  "seed": 505,
+  "episodes": 1000,
+  "decision": "CONFIRMED",
+  "checks": {
+    "K1a is robust (fixed at h* earns more than at h*/f (P&L difference)): robust": true,
+    "K1b is robust (fixed at h* earns more than at h*\u00b7f (P&L difference)): robust": true,
+    "K2 is robust (narrow fixed spread against informed flow loses (mean P&L)): robust": true,
+    "K3a is robust (Avellaneda-Stoikov std below fixed at the same spread (std ratio - 1)): robust": true,
+    "K3b is robust (skew std below fixed at the same spread (std ratio - 1)): robust": true,
+    "K4 is robust (slow requoting earns less than requoting every step (P&L difference)): robust": true
+  },
+  "labels": {
+    "K1a": "robust",
+    "K1b": "robust",
+    "K2": "robust",
+    "K3a": "robust",
+    "K3b": "robust",
+    "K4": "robust"
+  }
+}

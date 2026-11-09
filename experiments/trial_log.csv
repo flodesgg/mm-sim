@@ -115,3 +115,43 @@ run_id,started_utc,git_commit,config_hash,experiment,scenario,strategy,parameter
 20261109T214831Z-fa6890,2026-11-09T21:48:31+00:00,f6443b837a70,462cf8b0d9ce,,inventory,avellaneda_stoikov,"{""gamma"": 0.1}",1,1000
 20261109T214835Z-c27ee2,2026-11-09T21:48:35+00:00,f6443b837a70,462cf8b0d9ce,,inventory,fixed,"{""half_spread"": 0.75}",1,1000
 20261109T214839Z-19ae70,2026-11-09T21:48:39+00:00,f6443b837a70,d1c8fe6df97e,,jumpy,fixed,"{""half_spread"": 0.75}",1,1000
+20261109T220045Z-da3d7c,2026-11-09T22:00:45+00:00,c119b9766964,fbe6c4ea5f6c,EXP-005,baseline,fixed,"{""half_spread"": 0.7486745106189073, ""variant"": ""base""}",505,1000
+20261109T220045Z-da3d7c,2026-11-09T22:00:45+00:00,c119b9766964,fbe6c4ea5f6c,EXP-005,baseline,fixed,"{""half_spread"": 0.24955817020630244, ""variant"": ""base""}",505,1000
+20261109T220045Z-da3d7c,2026-11-09T22:00:45+00:00,c119b9766964,fbe6c4ea5f6c,EXP-005,baseline,fixed,"{""half_spread"": 2.246023531856722, ""variant"": ""base""}",505,1000
+20261109T220045Z-da3d7c,2026-11-09T22:00:45+00:00,c119b9766964,fbe6c4ea5f6c,EXP-005,baseline,fixed,"{""half_spread"": 0.1, ""variant"": ""base""}",505,1000
+20261109T220045Z-da3d7c,2026-11-09T22:00:45+00:00,c119b9766964,fbe6c4ea5f6c,EXP-005,baseline,avellaneda_stoikov,"{""gamma"": 0.1, ""variant"": ""base""}",505,1000
+20261109T220045Z-da3d7c,2026-11-09T22:00:45+00:00,c119b9766964,fbe6c4ea5f6c,EXP-005,baseline,fixed,"{""half_spread"": 0.750881125, ""variant"": ""base""}",505,1000
+20261109T220045Z-da3d7c,2026-11-09T22:00:45+00:00,c119b9766964,fbe6c4ea5f6c,EXP-005,baseline,skew,"{""half_spread"": 0.7486745106189073, ""kappa"": 0.05, ""variant"": ""base""}",505,1000
+20261109T220045Z-da3d7c,2026-11-09T22:00:45+00:00,c119b9766964,fbe6c4ea5f6c,EXP-005,baseline,fixed,"{""half_spread"": 0.753666475, ""variant"": ""base""}",505,1000
+20261109T220045Z-da3d7c,2026-11-09T22:00:45+00:00,c119b9766964,fbe6c4ea5f6c,EXP-005,baseline,fixed,"{""half_spread"": 0.7486745106189073, ""variant"": ""base""}",505,1000
+20261109T220045Z-da3d7c,2026-11-09T22:00:45+00:00,c119b9766964,fbe6c4ea5f6c,EXP-005,baseline,fixed,"{""half_spread"": 0.7486745106189073, ""variant"": ""base""}",505,1000
+20261109T220045Z-da3d7c,2026-11-09T22:00:45+00:00,c119b9766964,fbe6c4ea5f6c,EXP-005,baseline,fixed,"{""half_spread"": 0.7486745106189073, ""variant"": ""sigma_high""}",505,1000
+20261109T220045Z-da3d7c,2026-11-09T22:00:45+00:00,c119b9766964,fbe6c4ea5f6c,EXP-005,baseline,fixed,"{""half_spread"": 0.24955817020630244, ""variant"": ""sigma_high""}",505,1000
+20261109T220045Z-da3d7c,2026-11-09T22:00:45+00:00,c119b9766964,fbe6c4ea5f6c,EXP-005,baseline,fixed,"{""half_spread"": 2.246023531856722, ""variant"": ""sigma_high""}",505,1000
+20261109T220045Z-da3d7c,2026-11-09T22:00:45+00:00,c119b9766964,fbe6c4ea5f6c,EXP-005,baseline,fixed,"{""half_spread"": 0.1, ""variant"": ""sigma_high""}",505,1000
+20261109T220045Z-da3d7c,2026-11-09T22:00:45+00:00,c119b9766964,fbe6c4ea5f6c,EXP-005,baseline,avellaneda_stoikov,"{""gamma"": 0.1, ""variant"": ""sigma_high""}",505,1000
+20261109T220045Z-da3d7c,2026-11-09T22:00:45+00:00,c119b9766964,fbe6c4ea5f6c,EXP-005,baseline,fixed,"{""half_spread"": 1.0523793999999997, ""variant"": ""sigma_high""}",505,1000
+20261109T220045Z-da3d7c,2026-11-09T22:00:45+00:00,c119b9766964,fbe6c4ea5f6c,EXP-005,baseline,skew,"{""half_spread"": 0.7486745106189073, ""kappa"": 0.05, ""variant"": ""sigma_high""}",505,1000
+20261109T220045Z-da3d7c,2026-11-09T22:00:45+00:00,c119b9766964,fbe6c4ea5f6c,EXP-005,baseline,fixed,"{""half_spread"": 0.75365725, ""variant"": ""sigma_high""}",505,1000
+20261109T220045Z-da3d7c,2026-11-09T22:00:45+00:00,c119b9766964,fbe6c4ea5f6c,EXP-005,baseline,fixed,"{""half_spread"": 0.7486745106189073, ""variant"": ""sigma_high""}",505,1000
+20261109T220045Z-da3d7c,2026-11-09T22:00:45+00:00,c119b9766964,fbe6c4ea5f6c,EXP-005,baseline,fixed,"{""half_spread"": 0.7486745106189073, ""variant"": ""sigma_high""}",505,1000
+20261109T220045Z-da3d7c,2026-11-09T22:00:45+00:00,c119b9766964,fbe6c4ea5f6c,EXP-005,baseline,fixed,"{""half_spread"": 0.37433725914249055, ""variant"": ""k_high""}",505,1000
+20261109T220045Z-da3d7c,2026-11-09T22:00:45+00:00,c119b9766964,fbe6c4ea5f6c,EXP-005,baseline,fixed,"{""half_spread"": 0.12477908638083018, ""variant"": ""k_high""}",505,1000
+20261109T220045Z-da3d7c,2026-11-09T22:00:45+00:00,c119b9766964,fbe6c4ea5f6c,EXP-005,baseline,fixed,"{""half_spread"": 1.1230117774274717, ""variant"": ""k_high""}",505,1000
+20261109T220045Z-da3d7c,2026-11-09T22:00:45+00:00,c119b9766964,fbe6c4ea5f6c,EXP-005,baseline,fixed,"{""half_spread"": 0.1, ""variant"": ""k_high""}",505,1000
+20261109T220045Z-da3d7c,2026-11-09T22:00:45+00:00,c119b9766964,fbe6c4ea5f6c,EXP-005,baseline,avellaneda_stoikov,"{""gamma"": 0.1, ""variant"": ""k_high""}",505,1000
+20261109T220045Z-da3d7c,2026-11-09T22:00:45+00:00,c119b9766964,fbe6c4ea5f6c,EXP-005,baseline,fixed,"{""half_spread"": 0.433384825, ""variant"": ""k_high""}",505,1000
+20261109T220045Z-da3d7c,2026-11-09T22:00:45+00:00,c119b9766964,fbe6c4ea5f6c,EXP-005,baseline,skew,"{""half_spread"": 0.37433725914249055, ""kappa"": 0.05, ""variant"": ""k_high""}",505,1000
+20261109T220045Z-da3d7c,2026-11-09T22:00:45+00:00,c119b9766964,fbe6c4ea5f6c,EXP-005,baseline,fixed,"{""half_spread"": 0.37933742499999995, ""variant"": ""k_high""}",505,1000
+20261109T220045Z-da3d7c,2026-11-09T22:00:45+00:00,c119b9766964,fbe6c4ea5f6c,EXP-005,baseline,fixed,"{""half_spread"": 0.37433725914249055, ""variant"": ""k_high""}",505,1000
+20261109T220045Z-da3d7c,2026-11-09T22:00:45+00:00,c119b9766964,fbe6c4ea5f6c,EXP-005,baseline,fixed,"{""half_spread"": 0.37433725914249055, ""variant"": ""k_high""}",505,1000
+20261109T220045Z-da3d7c,2026-11-09T22:00:45+00:00,c119b9766964,fbe6c4ea5f6c,EXP-005,baseline,fixed,"{""half_spread"": 0.7486745106189073, ""variant"": ""jumps""}",505,1000
+20261109T220045Z-da3d7c,2026-11-09T22:00:45+00:00,c119b9766964,fbe6c4ea5f6c,EXP-005,baseline,fixed,"{""half_spread"": 0.24955817020630244, ""variant"": ""jumps""}",505,1000
+20261109T220045Z-da3d7c,2026-11-09T22:00:45+00:00,c119b9766964,fbe6c4ea5f6c,EXP-005,baseline,fixed,"{""half_spread"": 2.246023531856722, ""variant"": ""jumps""}",505,1000
+20261109T220045Z-da3d7c,2026-11-09T22:00:45+00:00,c119b9766964,fbe6c4ea5f6c,EXP-005,baseline,fixed,"{""half_spread"": 0.1, ""variant"": ""jumps""}",505,1000
+20261109T220045Z-da3d7c,2026-11-09T22:00:45+00:00,c119b9766964,fbe6c4ea5f6c,EXP-005,baseline,avellaneda_stoikov,"{""gamma"": 0.1, ""variant"": ""jumps""}",505,1000
+20261109T220045Z-da3d7c,2026-11-09T22:00:45+00:00,c119b9766964,fbe6c4ea5f6c,EXP-005,baseline,fixed,"{""half_spread"": 0.750881125, ""variant"": ""jumps""}",505,1000
+20261109T220045Z-da3d7c,2026-11-09T22:00:45+00:00,c119b9766964,fbe6c4ea5f6c,EXP-005,baseline,skew,"{""half_spread"": 0.7486745106189073, ""kappa"": 0.05, ""variant"": ""jumps""}",505,1000
+20261109T220045Z-da3d7c,2026-11-09T22:00:45+00:00,c119b9766964,fbe6c4ea5f6c,EXP-005,baseline,fixed,"{""half_spread"": 0.753666475, ""variant"": ""jumps""}",505,1000
+20261109T220045Z-da3d7c,2026-11-09T22:00:45+00:00,c119b9766964,fbe6c4ea5f6c,EXP-005,baseline,fixed,"{""half_spread"": 0.7486745106189073, ""variant"": ""jumps""}",505,1000
+20261109T220045Z-da3d7c,2026-11-09T22:00:45+00:00,c119b9766964,fbe6c4ea5f6c,EXP-005,baseline,fixed,"{""half_spread"": 0.7486745106189073, ""variant"": ""jumps""}",505,1000

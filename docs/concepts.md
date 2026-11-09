@@ -161,3 +161,23 @@ why real market makers spend so much on speed.
 
 **Liquidation cost.** Closing a position costs the spread and, for size, market impact. P&L
 that ignores it flatters strategies that finish with big inventory.
+
+## Stage D
+
+**Robustness and fragile conclusions.** A result that holds only for one set of parameters is
+a property of those parameters. Re-estimating it under other reasonable assumptions shows
+whether its direction survives. A conclusion whose sign flips is labelled fragile and not
+presented as a finding.
+
+**Sanity checks (SUSPICIOUS flags).** Some results cannot be right: profit below the
+break-even spread, a zero-profit market maker that earns money, a strategy that beats one that
+sees the future, an accounting identity that does not add up. Checking for them automatically
+catches bugs that would otherwise look like good news.
+
+**Reproducibility.** Every number is tied to a seed, a config hash and a commit, and a
+finished experiment can be rebuilt from scratch and compared with the stored result. A result
+that cannot be regenerated is not evidence.
+
+**Multiple comparisons and the trial log.** Try enough variants and one will look good by
+chance. Counting every run, and deciding the criteria before running, is what keeps a
+simulator from being a story generator.
