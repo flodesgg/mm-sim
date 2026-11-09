@@ -61,7 +61,7 @@ Also checked, in tests rather than experiments: a Glosten–Milgrom market maker
 two-value world has zero mean P&L, and its first spread equals the informed share times the
 value range (`tests/test_informed_and_gm.py`).
 
-Runs and grid points tried in total: 157 (every line of
+Runs and grid points tried in total: 158 at the time of writing (every line of
 [experiments/trial_log.csv](experiments/trial_log.csv)).
 
 ## Limitations
