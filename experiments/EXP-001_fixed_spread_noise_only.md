@@ -1,12 +1,12 @@
 ---
 id: EXP-001
 title: "Fixed half-spread against noise flow only: P&L mean and std versus theory"
-status: approved         # draft | approved | done
+status: done             # draft | approved | done
 approved_by: "Nick"      # approved in chat: "Утверждаю EXP-001"
 approved_on: 2026-11-09
 scenario: "baseline"
 config_hash: "98f30782c37f"
-decision: null           # CONFIRMED | REJECTED | INCONCLUSIVE
+decision: "CONFIRMED"    # CONFIRMED | REJECTED | INCONCLUSIVE
 kind: "fixed_spread_sweep"
 strategy: "fixed"
 grid:
@@ -95,12 +95,60 @@ verdict.
 
 ## Result
 
-Not run yet.
+Run once on 2026-11-09: run id `20261109T212048Z-f0ee9c`, git commit `6c91285cc39c` (clean),
+config hash `98f30782c37f`, seed 101, 1000 episodes per grid point. All numbers below are from
+`reports/experiments/EXP-001/sweep.csv`; the report is `reports/experiments/EXP-001/report.md`.
+
+| h | mean P&L | 95% CI | predicted | z | std | predicted std | ratio |
+|---|---|---|---|---|---|---|---|
+| 0.1 | 18.82 | [17.95, 19.69] | 18.90 | -0.19 | 14.02 | 14.15 | 0.991 |
+| 0.25 | 38.92 | [38.06, 39.79] | 38.73 | 0.45 | 13.97 | 13.98 | 0.999 |
+| 0.4 | 51.52 | [50.69, 52.35] | 51.36 | 0.38 | 13.39 | 13.72 | 0.976 |
+| 0.55 | 59.12 | [58.30, 59.94] | 58.27 | 2.03 | 13.22 | 13.40 | 0.987 |
+| 0.7 | 61.70 | [60.91, 62.49] | 60.86 | 2.09 | 12.70 | 13.03 | 0.975 |
+| 0.85 | 61.04 | [60.30, 61.78] | 60.35 | 1.83 | 11.92 | 12.62 | 0.944 |
+| 1.0 | 58.38 | [57.68, 59.09] | 57.73 | 1.81 | 11.42 | 12.19 | 0.937 |
+| 1.25 | 50.94 | [50.26, 51.61] | 50.74 | 0.59 | 10.82 | 11.41 | 0.948 |
+| 1.5 | 42.44 | [41.80, 43.08] | 42.51 | -0.22 | 10.34 | 10.59 | 0.976 |
+| 2.0 | 27.22 | [26.67, 27.77] | 27.27 | -0.16 | 8.83 | 8.90 | 0.992 |
+
+- C1 PASS: the largest `|z|` is 2.09 (limit 3.5).
+- C2 PASS: the highest simulated mean is at `h = 0.7`, the predicted grid point.
+- C3a PASS: std ratios are between 0.937 and 0.999 (limit 0.90 to 1.10).
+- C3b PASS: std 8.83 at `h = 2.0` against 14.02 at `h = 0.1`.
+- Precondition: the share of steps at the inventory limit is 0 at every grid point.
 
 ## Decision
 
-Not run yet.
+**CONFIRMED.** The simulated mean P&L follows the closed form at all ten half-spreads, the
+optimum is at the predicted grid point, and the std is within the pre-registered tolerance.
+
+Two things the verdict does not say, recorded so they are not forgotten:
+
+1. **All ten std ratios are below 1**, and the middle of the grid (0.85 to 1.25) is 5 to 6%
+   low. Each ratio has a standard error of roughly 2 to 3%, and the ten points share the same
+   random numbers, so they are not ten independent observations. From this single run I cannot
+   tell a small bias in the variance formula from chance. It passed the pre-registered 10%
+   rule; whether the formula is exact is an open question, and testing it needs a new
+   experiment on a new seed (not a rerun of this one).
+2. The four `z` values near +2 in the middle of the grid are also correlated through the common
+   random numbers; they are one mild fluctuation, not four.
 
 ## What I learned
 
-Not run yet.
+About the model (noise traders only, exponential fill intensity):
+
+- Wider quotes earn more per fill and fill less often; mean P&L has an interior maximum. At
+  `h = 0.1` the market maker gets about 180 fills for a mean of 18.8; at `h = 0.7` about 86
+  fills for 61.7.
+- The optimum is near `h = 0.74`, not `1/k = 0.67`. The `1/k` rule is the limit of small
+  `A·dt`; with `A·dt = 0.7` the chance of a fill per step is not proportional to the
+  intensity any more, and the exact maximiser is wider.
+- The curve is flat around the optimum (61.7 at 0.7, 61.0 at 0.85): choosing the half-spread
+  10 to 20% off costs about 1% of mean P&L.
+- P&L std (9 to 14) is large relative to the gain from tuning the spread, and it comes from
+  carried inventory, which this strategy does not control. That is the motivation for Stage C.
+
+What depends on the assumptions: no informed traders (a narrow spread is never punished),
+an exponential intensity (the location of the optimum), a martingale value (inventory earns
+zero on average), and a non-binding inventory limit.

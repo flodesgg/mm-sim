@@ -10,8 +10,16 @@ conclusion in this repository is a conclusion about the model, not about real ma
 ## Status
 
 Stage A is done: a reference engine with noise traders and a fixed-spread strategy, exact P&L
-accounting, a Monte Carlo runner and reports. The first pre-registered experiment (EXP-001) is
-written and not yet run, so there are **no headline results yet**. See [STATUS.md](STATUS.md).
+accounting, a Monte Carlo runner and reports. Informed traders, inventory management and
+latency come in later stages. See [STATUS.md](STATUS.md).
+
+## Results so far (statements about the model)
+
+| Experiment | Question | Result | File |
+|---|---|---|---|
+| EXP-001 | Fixed spread against noise traders only: does mean P&L follow the closed form, and where is the best half-spread? | CONFIRMED. Mean P&L within 2.1 standard errors of the formula at all 10 half-spreads (1000 episodes each, seed 101). Best grid point h = 0.7: mean 61.70, 95% CI [60.91, 62.49]; theory optimum 0.744, not 1/k = 0.667. | [report](reports/experiments/EXP-001/report.md), [pre-registration](experiments/EXP-001_fixed_spread_noise_only.md) |
+
+Variants tried so far: 11 (`experiments/trial_log.csv`).
 
 ## Questions the lab will answer (with plots and confidence intervals)
 
