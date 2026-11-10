@@ -1,9 +1,9 @@
 ---
 id: EXP-007
 title: "Skew against Avellaneda-Stoikov, head to head on liquidated P&L"
-status: draft            # draft | approved | done
-approved_by: null        # Nick
-approved_on: null        # YYYY-MM-DD
+status: approved         # draft | approved | done
+approved_by: "Nick"      # approved in chat: "Утверждаю оба"
+approved_on: 2026-11-10
 scenario: "inventory"
 config_hash: "462cf8b0d9ce"
 decision: null           # CONFIRMED | REJECTED | INCONCLUSIVE

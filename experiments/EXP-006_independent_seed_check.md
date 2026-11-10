@@ -1,9 +1,9 @@
 ---
 id: EXP-006
 title: "Are the closed forms biased? A check on independent seeds"
-status: draft            # draft | approved | done
-approved_by: null        # Nick
-approved_on: null        # YYYY-MM-DD
+status: approved         # draft | approved | done
+approved_by: "Nick"      # approved in chat: "Утверждаю оба"
+approved_on: 2026-11-10
 scenario: "baseline"
 config_hash: "fbe6c4ea5f6c"
 decision: null           # CONFIRMED | REJECTED
