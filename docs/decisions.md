@@ -151,6 +151,6 @@ One line per decision or bug fix, newest last. Format: date — decision — rea
   pre-registered liquidated one, although it had no criterion — it is the measure the losing
   strategy was designed for, and it changes the conclusion from "skew beats AS" to "they tie
   until closing the position costs something".
-- 2026-11-10 — History of `main` rewritten (Nick's request) to replace a personal email with
-  the GitHub noreply address; only `pyproject.toml` and author fields changed. Run logs keep
-  the original commit hashes; [commit_map.md](commit_map.md) maps them to the new ones.
+- 2026-11-10 — History of `main` rewritten (Nick's request) before publication. Commit hashes
+  recorded in run logs and reports before this date refer to commits that are no longer in
+  the repository.

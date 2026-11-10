@@ -84,8 +84,9 @@ Runs and grid points tried in total: 172 at the time of writing (every line of
   formula in EXP-001, means above theory in EXP-002); EXP-006 retested both on independent
   seeds and found no bias.
 - **Process.** EXP-001, EXP-006 and EXP-007 were approved by me. EXP-002 to EXP-005 were
-  approved during an overnight run; those decisions are listed in
-  [docs/overnight_log.md](docs/overnight_log.md).
+  approved under delegation during an overnight run, not by me; each of those experiment files
+  says so in `approved_by`, and the other choices made under that delegation are marked
+  "(delegated)" in [docs/decisions.md](docs/decisions.md).
 
 ## Reproduce
 
@@ -122,7 +123,7 @@ it until it is approved and its config hash matches.
 | [src/mm_sim/engine/fast.py](src/mm_sim/engine/fast.py) | vectorised engine, same results, 13 to 28 times faster ([docs/performance.md](docs/performance.md)) |
 | [tests/](tests/) | hand-computed engine steps, property tests, the look-ahead test with a cheating control |
 | [experiments/](experiments/) | pre-registrations with results, and the trial log |
-| [docs/](docs/) | [model notes](docs/model_notes.md), [concepts](docs/concepts.md), [decisions](docs/decisions.md), [interview prep](docs/interview_prep.md) |
+| [docs/](docs/) | [model notes](docs/model_notes.md), [concepts](docs/concepts.md), [decisions](docs/decisions.md) |
 
 ## What I learned
 

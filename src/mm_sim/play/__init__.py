@@ -1,4 +1,1 @@
-"""Interactive quoting game (Stage E).
-
-Empty until that stage: see STATUS.md.
-"""
+"""Interactive quoting game: quote against the simulated flow yourself."""

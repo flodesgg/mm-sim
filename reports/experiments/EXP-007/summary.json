@@ -25,9 +25,9 @@
   },
   "reproduction": {
     "run": {
-      "run_id": "20261110T060341Z-f1ea40",
-      "started_utc": "2026-11-10T06:03:41+00:00",
-      "git_commit": "a2611b572974",
+      "run_id": "20261110T183741Z-4059a2",
+      "started_utc": "2026-11-10T18:37:41+00:00",
+      "git_commit": "c18a52327bf5",
       "git_dirty": true,
       "config_hash": "462cf8b0d9ce",
       "scenario": "inventory"
