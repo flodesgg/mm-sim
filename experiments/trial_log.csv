@@ -157,3 +157,15 @@ run_id,started_utc,git_commit,config_hash,experiment,scenario,strategy,parameter
 20261109T220045Z-da3d7c,2026-11-09T22:00:45+00:00,c119b9766964,fbe6c4ea5f6c,EXP-005,baseline,fixed,"{""half_spread"": 0.7486745106189073, ""variant"": ""jumps""}",505,1000
 20261109T220319Z-48d238,2026-11-09T22:03:19+00:00,d4003da403b0,ebc690a89178,,toxic,fixed,"{""half_spread"": 0.75}",2,1000
 20261109T222631Z-da60a5,2026-11-09T22:26:31+00:00,47b3d702865b,462cf8b0d9ce,,inventory,skew,"{""half_spread"": 0.75, ""kappa"": 0.05}",1,1000
+20261110T055459Z-fb6728,2026-11-10T05:54:59+00:00,f4305a32555a,fbe6c4ea5f6c,EXP-006,baseline,fixed,"{""flow.informed.intensity"": 0.0, ""half_spread"": 0.4, ""part"": ""A_std""}",6000,4000
+20261110T055459Z-fb6728,2026-11-10T05:54:59+00:00,f4305a32555a,fbe6c4ea5f6c,EXP-006,baseline,fixed,"{""flow.informed.intensity"": 0.0, ""half_spread"": 0.7, ""part"": ""A_std""}",7000,4000
+20261110T055459Z-fb6728,2026-11-10T05:54:59+00:00,f4305a32555a,fbe6c4ea5f6c,EXP-006,baseline,fixed,"{""flow.informed.intensity"": 0.0, ""half_spread"": 0.85, ""part"": ""A_std""}",8000,4000
+20261110T055459Z-fb6728,2026-11-10T05:54:59+00:00,f4305a32555a,fbe6c4ea5f6c,EXP-006,baseline,fixed,"{""flow.informed.intensity"": 0.0, ""half_spread"": 1.0, ""part"": ""A_std""}",9000,4000
+20261110T055459Z-fb6728,2026-11-10T05:54:59+00:00,f4305a32555a,fbe6c4ea5f6c,EXP-006,baseline,fixed,"{""flow.informed.intensity"": 0.0, ""half_spread"": 1.25, ""part"": ""A_std""}",10000,4000
+20261110T055459Z-fb6728,2026-11-10T05:54:59+00:00,f4305a32555a,fbe6c4ea5f6c,EXP-006,baseline,fixed,"{""flow.informed.intensity"": 0.0, ""half_spread"": 1.5, ""part"": ""A_std""}",11000,4000
+20261110T055459Z-fb6728,2026-11-10T05:54:59+00:00,f4305a32555a,fbe6c4ea5f6c,EXP-006,baseline,fixed,"{""flow.informed.intensity"": 20.0, ""half_spread"": 0.3, ""part"": ""B_mean""}",12000,4000
+20261110T055459Z-fb6728,2026-11-10T05:54:59+00:00,f4305a32555a,fbe6c4ea5f6c,EXP-006,baseline,fixed,"{""flow.informed.intensity"": 40.0, ""half_spread"": 0.4, ""part"": ""B_mean""}",13000,4000
+20261110T055459Z-fb6728,2026-11-10T05:54:59+00:00,f4305a32555a,fbe6c4ea5f6c,EXP-006,baseline,fixed,"{""flow.informed.intensity"": 80.0, ""half_spread"": 0.5, ""part"": ""B_mean""}",14000,4000
+20261110T055459Z-fb6728,2026-11-10T05:54:59+00:00,f4305a32555a,fbe6c4ea5f6c,EXP-006,baseline,fixed,"{""flow.informed.intensity"": 120.0, ""half_spread"": 0.3, ""part"": ""B_mean""}",15000,4000
+20261110T055459Z-fb6728,2026-11-10T05:54:59+00:00,f4305a32555a,fbe6c4ea5f6c,EXP-006,baseline,fixed,"{""flow.informed.intensity"": 160.0, ""half_spread"": 0.6, ""part"": ""B_mean""}",16000,4000
+20261110T055459Z-fb6728,2026-11-10T05:54:59+00:00,f4305a32555a,fbe6c4ea5f6c,EXP-006,baseline,fixed,"{""flow.informed.intensity"": 200.0, ""half_spread"": 0.4, ""part"": ""B_mean""}",17000,4000
