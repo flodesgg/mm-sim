@@ -1,10 +1,22 @@
 # secrets (this project needs none; ignored anyway)
 .env
 .env.*
+*.pem
+*.key
+secrets.*
 
-# logs and downloaded data are never committed
+# logs and data from third-party providers are never committed
 /logs/
 /data/
+/raw_data/
+*.parquet
+*.feather
+*.h5
+*.hdf5
+*.zip
+*.gz
+*.tar
+*.7z
 
 # python / tooling
 .venv/

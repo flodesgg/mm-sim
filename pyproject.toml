@@ -3,6 +3,7 @@ name = "mm-sim"
 version = "0.1.0"
 description = "Market-making simulator lab: quotes, noise and informed order flow, P&L decomposition (simulation only)"
 readme = "README.md"
+license = "MIT"
 authors = [
     { name = "Nick", email = "119965654+flodesgg@users.noreply.github.com" }
 ]

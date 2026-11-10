@@ -88,6 +88,8 @@ Runs and grid points tried in total: 172 at the time of writing (every line of
 
 ## Reproduce
 
+Needs Python 3.13 and [uv](https://docs.astral.sh/uv/). No accounts, keys or downloads.
+
 ```bash
 uv sync                # Python 3.13 environment from the lockfile
 make check             # ruff, mypy --strict, tests (about half a minute)
@@ -142,3 +144,7 @@ it until it is approved and its config hash matches.
   can fail caught real mistakes during the build: a closed form that was wrong by 14 standard
   errors, and rows of agreeing results that were one shared fluctuation, not many
   confirmations ([docs/decisions.md](docs/decisions.md)).
+
+## License
+
+[MIT](LICENSE).
