@@ -14,5 +14,55 @@
   "checks": {
     "H1 A has a higher mean liquidated P&L than B (paired CI above 0)": true,
     "H2 A's std of liquidated P&L is not above B's (ratio CI upper end below 1)": true
+  },
+  "original_run": {
+    "run_id": "20261110T055616Z-ecb1a6",
+    "started_utc": "2026-11-10T05:56:16+00:00",
+    "git_commit": "3596e05026ef",
+    "git_dirty": false,
+    "config_hash": "462cf8b0d9ce",
+    "scenario": "inventory"
+  },
+  "reproduction": {
+    "run": {
+      "run_id": "20261110T060341Z-f1ea40",
+      "started_utc": "2026-11-10T06:03:41+00:00",
+      "git_commit": "a2611b572974",
+      "git_dirty": true,
+      "config_hash": "462cf8b0d9ce",
+      "scenario": "inventory"
+    },
+    "pinned_config_hash": "462cf8b0d9ce",
+    "columns_compared": [
+      "measure",
+      "a",
+      "b",
+      "mean_a",
+      "mean_a_ci_low",
+      "mean_a_ci_high",
+      "std_a",
+      "mean_b",
+      "mean_b_ci_low",
+      "mean_b_ci_high",
+      "std_b",
+      "mean_diff",
+      "mean_diff_ci_low",
+      "mean_diff_ci_high",
+      "std_ratio",
+      "std_ratio_ci_low",
+      "std_ratio_ci_high",
+      "ce_a",
+      "ce_b",
+      "ce_diff",
+      "ce_diff_ci_low",
+      "ce_diff_ci_high",
+      "quoted_spread_a",
+      "quoted_spread_b",
+      "terminal_q_std_a",
+      "terminal_q_std_b",
+      "mean_abs_q_a",
+      "mean_abs_q_b"
+    ],
+    "largest_relative_difference": 0.0
   }
 }

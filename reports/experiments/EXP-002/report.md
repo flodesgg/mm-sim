@@ -19,7 +19,7 @@ Specific to this experiment: informed traders know the value 50 steps ahead and 
 - scenario: `toxic`, config hash `92ddd4ad4197`
 - run id `20261109T213355Z-c3f5f0`, git commit `2c0240941c5c`
 - root seed 202, 1000 episodes
-- variants tried so far in this repository (lines in `experiments/trial_log.csv`): 157
+- variants tried so far in this repository (lines in `experiments/trial_log.csv`): 172
 - strategy `fixed`, half-spreads `{"half_spread": [0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.75, 1.0, 1.5]}`, informed intensities `{"flow.informed.intensity": [0.0, 20.0, 40.0, 80.0, 120.0, 160.0, 200.0]}`; every cell uses the same seed
 - pre-registered as EXP-002, approved by delegation during an overnight run on 2026-11-09
 

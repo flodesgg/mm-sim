@@ -19,7 +19,7 @@ Specific to this experiment: it tests the simulator against its own closed forms
 - scenario: `baseline`, config hash `fbe6c4ea5f6c`
 - run id `20261110T055459Z-fb6728`, git commit `f4305a32555a`
 - root seed 6000, 4000 episodes
-- variants tried so far in this repository (lines in `experiments/trial_log.csv`): 170
+- variants tried so far in this repository (lines in `experiments/trial_log.csv`): 172
 - every cell has its own seed: `6000 + 1000 * cell index`, so the cells are independent
 - settings `{"std_half_spreads": [0.4, 0.7, 0.85, 1.0, 1.25, 1.5], "informed": {"flow.informed.horizon_steps": 50, "engine.q_max": 200}, "mean_cells": [[20.0, 0.3], [40.0, 0.4], [80.0, 0.5], [120.0, 0.3], [160.0, 0.6], [200.0, 0.4]]}`
 - pre-registered as EXP-006, approved by Nick on 2026-11-10

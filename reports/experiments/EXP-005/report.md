@@ -19,7 +19,7 @@ Specific to this experiment: the variants change one model assumption at a time,
 - scenario: `baseline`, config hash `fbe6c4ea5f6c`
 - run id `20261109T220045Z-da3d7c`, git commit `c119b9766964`
 - root seed 505, 1000 episodes
-- variants tried so far in this repository (lines in `experiments/trial_log.csv`): 157
+- variants tried so far in this repository (lines in `experiments/trial_log.csv`): 172
 - variants: `{"base": {}, "sigma_high": {"market.sigma": 4.0}, "k_high": {"flow.noise.k": 3.0}, "jumps": {"market.process": "jump_diffusion", "market.jump.intensity": 5.0, "market.jump.size": 1.0}}`
 - other settings: `{"spread_factor": 3.0, "informed": {"flow.informed.intensity": 120.0, "flow.informed.horizon_steps": 50, "engine.q_max": 200}, "narrow_half_spread": 0.1, "inventory": {"engine.liq_half_spread": 0.5, "engine.liq_impact": 0.05}, "as_gamma": 0.1, "skew_kappa": 0.05, "latency": {"engine.q_max": 200}, "slow_requote": 5}`
 - pre-registered as EXP-005, approved by delegation during an overnight run on 2026-11-09

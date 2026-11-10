@@ -18,5 +18,39 @@
     "B2 mean with informed flow: pooled |z| <= 3 (no common bias)": true
   },
   "pooled_z_std": -0.14074021858197047,
-  "pooled_z_mean": -1.1388635275682604
+  "pooled_z_mean": -1.1388635275682604,
+  "original_run": {
+    "run_id": "20261110T055459Z-fb6728",
+    "started_utc": "2026-11-10T05:54:59+00:00",
+    "git_commit": "f4305a32555a",
+    "git_dirty": false,
+    "config_hash": "fbe6c4ea5f6c",
+    "scenario": "baseline"
+  },
+  "reproduction": {
+    "run": {
+      "run_id": "20261110T060219Z-5bb5e2",
+      "started_utc": "2026-11-10T06:02:19+00:00",
+      "git_commit": "a2611b572974",
+      "git_dirty": true,
+      "config_hash": "fbe6c4ea5f6c",
+      "scenario": "baseline"
+    },
+    "pinned_config_hash": "fbe6c4ea5f6c",
+    "columns_compared": [
+      "part",
+      "informed_intensity",
+      "half_spread",
+      "seed",
+      "simulated",
+      "ci_low",
+      "ci_high",
+      "theory",
+      "ratio",
+      "se",
+      "z",
+      "share_at_limit"
+    ],
+    "largest_relative_difference": 0.0
+  }
 }
