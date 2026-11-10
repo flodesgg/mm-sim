@@ -33,7 +33,9 @@ from rich.console import Console
 from mm_sim import __version__
 from mm_sim.analysis import (
     exp_fixed_spread,
+    exp_formula_check,
     exp_frontier,
+    exp_head_to_head,
     exp_heatmap,
     exp_latency,
     exp_robustness,
@@ -64,6 +66,8 @@ EXPERIMENT_KINDS: dict[str, ModuleType] = {
     "inventory_frontier": exp_frontier,
     "latency_sweep": exp_latency,
     "robustness": exp_robustness,
+    "independent_seed_check": exp_formula_check,
+    "head_to_head": exp_head_to_head,
 }
 
 

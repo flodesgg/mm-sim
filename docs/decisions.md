@@ -136,3 +136,14 @@ One line per decision or bug fix, newest last. Format: date — decision — rea
   own run is recorded in `summary.json` — `make figures` then leaves reports unchanged.
 - 2026-11-09 — Theory functions use `math.erfc`/`math.exp` instead of `scipy.stats.norm` —
   several times faster; `make figures` confirmed that every stored theory value is unchanged.
+- 2026-11-10 — The open questions are settled by new experiments (EXP-006, EXP-007) on new
+  seeds, not by rerunning EXP-001..003 — a finished experiment runs once; a pattern noticed in
+  its results is a hypothesis for the next one.
+- 2026-11-10 — EXP-006 gives every cell its own seed and adds a pooled z (mean z times the
+  square root of the number of cells) — with common random numbers the cells of EXP-001/002
+  were not independent, which is exactly why a one-sided pattern there could not be judged.
+- 2026-11-10 — EXP-007 fixes one parameter pair (skew kappa = 0.2 against AS gamma = 0.1) and
+  says in the file that the pair was chosen because it looked best in EXP-003 — selection
+  inflates effects; the new seed and pre-set criteria are the correction.
+- 2026-11-10 — Nick is back; EXP-006 and EXP-007 wait for his approval. The overnight
+  delegation covered EXP-002 to EXP-005 only.
