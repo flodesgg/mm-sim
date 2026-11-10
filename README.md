@@ -84,7 +84,8 @@ Runs and grid points tried in total: 172 at the time of writing (every line of
   formula in EXP-001, means above theory in EXP-002); EXP-006 retested both on independent
   seeds and found no bias.
 - **Process.** EXP-001, EXP-006 and EXP-007 were approved by me. EXP-002 to EXP-005 were
-  approved under delegation during an overnight run, not by me.
+  approved during an overnight run; those decisions are listed in
+  [docs/overnight_log.md](docs/overnight_log.md).
 
 ## Reproduce
 
