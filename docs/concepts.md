@@ -202,3 +202,23 @@ then never bought with a silent change of behaviour.
 **Vectorisation.** Replacing a Python loop over episodes by numpy operations on whole arrays.
 The loop over time steps stays, because each step depends on the previous one; the episodes
 are independent, so they can be advanced together.
+
+## Follow-up experiments
+
+**Shared seeds are one observation.** When every grid point uses the same random numbers, their
+errors are correlated: all of them can sit on the same side of the truth by chance. That is
+ideal for comparing two strategies (the shared error cancels) and misleading for asking
+whether a formula is biased. For the second question each cell needs its own seed.
+
+**Pooled z.** With independent cells, the average z-score times the square root of the number
+of cells is itself standard normal if there is no bias. It detects a small bias that has the
+same sign everywhere, which no single cell could show.
+
+**Selection inflates effects.** A pair of settings picked because it looked best in one run
+will, on average, look less good in the next. A pattern found by inspecting results is
+re-tested on new data with criteria fixed in advance before it is called a finding.
+
+**Optimal for which objective?** A strategy derived as optimal maximises a stated objective
+under stated assumptions. Change the objective slightly (here: charge for closing the final
+position) and the ranking of strategies can change. Always ask what a "best" strategy is best
+at.

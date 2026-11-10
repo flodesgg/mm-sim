@@ -1,12 +1,12 @@
 ---
 id: EXP-007
 title: "Skew against Avellaneda-Stoikov, head to head on liquidated P&L"
-status: approved         # draft | approved | done
+status: done             # draft | approved | done
 approved_by: "Nick"      # approved in chat: "Утверждаю оба"
 approved_on: 2026-11-10
 scenario: "inventory"
 config_hash: "462cf8b0d9ce"
-decision: null           # CONFIRMED | REJECTED | INCONCLUSIVE
+decision: "CONFIRMED"    # CONFIRMED | REJECTED | INCONCLUSIVE
 kind: "head_to_head"
 strategy: "skew"
 grid: {}
@@ -79,12 +79,57 @@ general; a tuned `γ`, or an AS variant that accounts for the liquidation cost, 
 
 ## Result
 
-Not run yet.
+Run once on 2026-11-10: run id `20261110T055616Z-ecb1a6`, git commit `3596e05026ef` (clean),
+config hash `462cf8b0d9ce`, seed 707, 4000 episodes. Numbers from
+`reports/experiments/EXP-007/head_to_head.csv`; report:
+`reports/experiments/EXP-007/report.md`.
+
+A = skew (`κ = 0.2`, half-spread 0.75), B = Avellaneda–Stoikov (`γ = 0.1`):
+
+| measure | A: mean [95% CI] | A: std | B: mean [95% CI] | B: std | mean A − B [95% CI] | std A / B [95% CI] | CE A − B [95% CI] |
+|---|---|---|---|---|---|---|---|
+| liquidated P&L | 56.59 [56.40, 56.77] | 6.05 | 55.60 [55.40, 55.80] | 6.40 | 0.98 [0.89, 1.08] | 0.946 [0.932, 0.961] | 1.22 [1.09, 1.33] |
+| mark-to-market P&L | 57.14 [56.96, 57.33] | 6.06 | 57.24 [57.04, 57.44] | 6.33 | -0.10 [-0.19, -0.01] | 0.957 [0.944, 0.971] | 0.07 [-0.04, 0.18] |
+
+Average quoted spread: A 1.510, B 1.502. Std of terminal inventory: A 1.27, B 3.02 lots.
+Mean |inventory| during the episode: A 0.93, B 1.06.
+
+- H1 PASS: mean liquidated P&L of skew is 0.98 higher, CI [0.89, 1.08].
+- H2 PASS: std ratio 0.946, CI [0.932, 0.961], upper end below 1.
 
 ## Decision
 
-Not run yet.
+**CONFIRMED.** On liquidated P&L, skew `κ = 0.2` earns more than Avellaneda–Stoikov `γ = 0.1`
+(by 0.98, about 1.8% of the mean) with a lower std (5.4% lower).
+
+What the verdict does not say, from the row reported without a prediction:
+
+- **On mark-to-market P&L, the objective AS is derived for, AS is not worse.** Its mean is 0.10
+  higher (CI [0.01, 0.19]), the skew's std is 4.3% lower, and the certainty-equivalent
+  difference is 0.07 with a CI that includes zero ([−0.04, 0.18]). On AS's own objective the
+  two are a tie.
+- **The whole advantage of the skew is the liquidation cost.** Mark-to-market the means differ
+  by −0.10; liquidated by +0.98. AS finishes with a terminal inventory std of 3.02 lots
+  against 1.27, although its average inventory during the episode is almost the same (1.06
+  against 0.93). That is what the proposed mechanism predicts: AS's inventory shift
+  `γ·σ²·(T − t)` fades to zero at the end, so it stops pulling inventory back exactly when the
+  position is about to be closed at a cost. The mechanism is consistent with these numbers; it
+  was not tested by intervention.
+- One parameter pair, chosen because it looked best in EXP-003, under one invented liquidation
+  cost. It does not show that skew beats AS in general, and an AS variant that knows about the
+  liquidation cost would be the fair opponent.
+- The effect is small in absolute terms. It is measured precisely only because the comparison
+  is paired.
 
 ## What I learned
 
-Not run yet.
+- "Which strategy is better" depends on the objective. AS is as good as the skew at what it
+  optimises (terminal mark-to-market wealth) and worse once terminal inventory has a price,
+  because the model it was derived from has no such price.
+- A strategy that is optimal in a model inherits the model's blind spots. Here the blind spot
+  is visible in one number: terminal inventory.
+- Looking only at the liquidated row, I would have concluded "skew beats AS". The
+  mark-to-market row changes that to "they tie, until closing the position costs something".
+  Reporting the measure the other side was designed for is what kept the conclusion honest.
+- EXP-003's observation survived a new seed, with nearly the same numbers (0.97 there, 0.98
+  here). It was a real effect of this model, and a narrower one than it looked.

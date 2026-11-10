@@ -147,3 +147,7 @@ One line per decision or bug fix, newest last. Format: date — decision — rea
   inflates effects; the new seed and pre-set criteria are the correction.
 - 2026-11-10 — Nick is back; EXP-006 and EXP-007 wait for his approval. The overnight
   delegation covered EXP-002 to EXP-005 only.
+- 2026-11-10 — EXP-007's report states the mark-to-market comparison next to the
+  pre-registered liquidated one, although it had no criterion — it is the measure the losing
+  strategy was designed for, and it changes the conclusion from "skew beats AS" to "they tie
+  until closing the position costs something".

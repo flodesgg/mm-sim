@@ -1,12 +1,12 @@
 ---
 id: EXP-006
 title: "Are the closed forms biased? A check on independent seeds"
-status: approved         # draft | approved | done
+status: done             # draft | approved | done
 approved_by: "Nick"      # approved in chat: "Утверждаю оба"
 approved_on: 2026-11-10
 scenario: "baseline"
 config_hash: "fbe6c4ea5f6c"
-decision: null           # CONFIRMED | REJECTED
+decision: "CONFIRMED"    # CONFIRMED | REJECTED
 kind: "independent_seed_check"
 strategy: "fixed"
 grid: {}
@@ -104,12 +104,64 @@ Under the hypothesis the chance that some criterion fails is about 3.5%.
 
 ## Result
 
-Not run yet.
+Run once on 2026-11-10: run id `20261110T055459Z-fb6728`, git commit `f4305a32555a` (clean),
+config hash `fbe6c4ea5f6c`, 4000 episodes per cell, seeds 6000 to 17000. Numbers from
+`reports/experiments/EXP-006/cells.csv`; report: `reports/experiments/EXP-006/report.md`.
+
+Part A, std of P&L (noise traders only):
+
+| half-spread | seed | simulated std [95% CI] | predicted | ratio | z |
+|---|---|---|---|---|---|
+| 0.4 | 6000 | 14.020 [13.459, 14.580] | 13.722 | 1.022 | 1.04 |
+| 0.7 | 7000 | 12.891 [12.484, 13.319] | 13.028 | 0.989 | -0.64 |
+| 0.85 | 8000 | 12.788 [12.412, 13.169] | 12.623 | 1.013 | 0.86 |
+| 1.0 | 9000 | 12.092 [11.727, 12.463] | 12.189 | 0.992 | -0.51 |
+| 1.25 | 10000 | 11.306 [10.987, 11.618] | 11.414 | 0.990 | -0.67 |
+| 1.5 | 11000 | 10.536 [10.263, 10.807] | 10.593 | 0.995 | -0.41 |
+
+Mean ratio 1.000; pooled z −0.14.
+
+Part B, mean P&L with informed flow:
+
+| λ_I | half-spread | seed | simulated mean [95% CI] | predicted | z |
+|---|---|---|---|---|---|
+| 20 | 0.3 | 12000 | 37.50 [37.02, 37.97] | 37.61 | -0.45 |
+| 40 | 0.4 | 13000 | 39.97 [39.41, 40.54] | 40.33 | -1.24 |
+| 80 | 0.5 | 14000 | 36.50 [35.63, 37.36] | 36.73 | -0.53 |
+| 120 | 0.3 | 15000 | 7.02 [5.82, 8.21] | 7.32 | -0.50 |
+| 160 | 0.6 | 16000 | 24.99 [23.43, 26.56] | 24.54 | 0.57 |
+| 200 | 0.4 | 17000 | -4.41 [-6.38, -2.45] | -3.77 | -0.65 |
+
+Pooled z −1.14. Share of steps at the inventory limit: 0 in every cell.
+
+- A1 PASS: largest `|z|` for the std is 1.04.
+- A2 PASS: pooled z for the std is −0.14.
+- B1 PASS: largest `|z|` for the mean is 1.24.
+- B2 PASS: pooled z for the mean is −1.14.
 
 ## Decision
 
-Not run yet.
+**CONFIRMED.** No bias found in either closed form.
+
+What this settles, and what it does not:
+
+- The one-sided patterns in EXP-001 (every std below the formula) and EXP-002 (every mean
+  above theory) did not reappear on independent seeds. Four of six std ratios are below 1 and
+  two above; the mean ratio is 1.000. Five of six means are below theory this time, the
+  opposite side from EXP-002. The patterns there were shared-seed fluctuations.
+- "No bias found" has a resolution. With these standard errors (about 1.6 to 2% for a std,
+  0.24 to 1.0 for a mean), a common std bias of 2% or more, or a common mean bias of about
+  0.5 or more, would very likely have been caught by the pooled statistic. A smaller bias is
+  not excluded.
+- Only the twelve cells listed were tested.
 
 ## What I learned
 
-Not run yet.
+- Grid points that share a seed move together. Ten ratios below 1, or seventy z-scores above
+  0, are then one observation, and reading them as a trend is a mistake. The cure is cheap:
+  independent seeds for the question "is there a bias", common seeds for the question "which
+  of two strategies is better".
+- The sample std of this P&L is noisy: even at 4000 episodes its 95% CI is about ±4%. The 5%
+  deviations at 1000 episodes in EXP-001 were inside the noise.
+- A pooled statistic across independent cells is far more sensitive to a small common bias
+  than any single cell.

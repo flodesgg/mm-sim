@@ -169,3 +169,5 @@ run_id,started_utc,git_commit,config_hash,experiment,scenario,strategy,parameter
 20261110T055459Z-fb6728,2026-11-10T05:54:59+00:00,f4305a32555a,fbe6c4ea5f6c,EXP-006,baseline,fixed,"{""flow.informed.intensity"": 120.0, ""half_spread"": 0.3, ""part"": ""B_mean""}",15000,4000
 20261110T055459Z-fb6728,2026-11-10T05:54:59+00:00,f4305a32555a,fbe6c4ea5f6c,EXP-006,baseline,fixed,"{""flow.informed.intensity"": 160.0, ""half_spread"": 0.6, ""part"": ""B_mean""}",16000,4000
 20261110T055459Z-fb6728,2026-11-10T05:54:59+00:00,f4305a32555a,fbe6c4ea5f6c,EXP-006,baseline,fixed,"{""flow.informed.intensity"": 200.0, ""half_spread"": 0.4, ""part"": ""B_mean""}",17000,4000
+20261110T055616Z-ecb1a6,2026-11-10T05:56:16+00:00,3596e05026ef,462cf8b0d9ce,EXP-007,inventory,skew,"{""half_spread"": 0.75, ""kappa"": 0.2}",707,4000
+20261110T055616Z-ecb1a6,2026-11-10T05:56:16+00:00,3596e05026ef,462cf8b0d9ce,EXP-007,inventory,avellaneda_stoikov,"{""gamma"": 0.1}",707,4000

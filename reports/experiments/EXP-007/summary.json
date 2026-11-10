@@ -1,0 +1,18 @@
+{
+  "run": {
+    "run_id": "20261110T055616Z-ecb1a6",
+    "started_utc": "2026-11-10T05:56:16+00:00",
+    "git_commit": "3596e05026ef",
+    "git_dirty": false,
+    "config_hash": "462cf8b0d9ce",
+    "scenario": "inventory"
+  },
+  "experiment": "EXP-007",
+  "seed": 707,
+  "episodes": 4000,
+  "decision": "CONFIRMED",
+  "checks": {
+    "H1 A has a higher mean liquidated P&L than B (paired CI above 0)": true,
+    "H2 A's std of liquidated P&L is not above B's (ratio CI upper end below 1)": true
+  }
+}

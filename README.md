@@ -2,8 +2,10 @@
 
 I built this to understand market making by building it: a simulated asset, a market maker
 that posts a bid and an ask, and order flow from uninformed (noise) traders and from informed
-traders who know where the price is going. Five pre-registered experiments measure how the
+traders who know where the price is going. Pre-registered experiments measure how the
 spread, adverse selection, inventory management and latency drive the market maker's P&L.
+Seven pre-registered experiments in total: five on the model, two that re-test what the first
+five left open.
 
 **Simulation only.** No exchange, no broker, no orders, no API keys, no real money. Every
 conclusion below is a conclusion about this model, not about real markets. Parameters are
@@ -56,12 +58,14 @@ confidence intervals.
 | EXP-003 | What does inventory management buy against fixed quotes with the same average spread? | CONFIRMED. Avellaneda–Stoikov (γ = 0.1) cuts the std of liquidated P&L to 0.417 of the benchmark's [0.374, 0.464] (seed 303). Mark-to-market it gives up about 5.7% of mean P&L (57.16 against 60.64). A plain inventory skew does at least as well here. | [report](reports/experiments/EXP-003/report.md), [pre-registration](experiments/EXP-003_inventory_frontier.md) |
 | EXP-004 | What do stale quotes cost when the price jumps? | CONFIRMED. Requoting every 5 steps instead of every step: mean P&L 54.70 [53.47, 55.93] against 61.30 [60.23, 62.38], with 5.66 pick-offs per episode losing 0.35 each (seed 404). Every 20 steps: 30.07. Matches the closed form. | [report](reports/experiments/EXP-004/report.md), [pre-registration](experiments/EXP-004_latency_and_jumps.md) |
 | EXP-005 | Do these conclusions survive other assumptions (volatility doubled, fill decay `k` doubled, jumps)? | CONFIRMED. All six conclusions keep their sign, CI excluding zero, in all four variants; none is fragile (seed 505). The sizes change a lot: doubling volatility triples the loss of a narrow spread to informed flow (−21.6 to −68.5). | [report](reports/experiments/EXP-005/report.md), [pre-registration](experiments/EXP-005_robustness.md) |
+| EXP-006 | Are the closed forms biased? (EXP-001 and EXP-002 each showed a one-sided pattern on a single shared seed.) | CONFIRMED: no bias found. With an independent seed per cell and 4000 episodes each, simulated std / formula averages 1.000 over six half-spreads (pooled z −0.14); six means with informed flow give pooled z −1.14. The earlier patterns were shared-seed fluctuations. | [report](reports/experiments/EXP-006/report.md), [pre-registration](experiments/EXP-006_independent_seed_check.md) |
+| EXP-007 | Does a plain skew really beat Avellaneda–Stoikov, as EXP-003 seemed to show? | CONFIRMED, narrowly. On liquidated P&L skew (κ = 0.2) earns 0.98 more [0.89, 1.08] with 5.4% less std (4000 paired episodes, seed 707). On mark-to-market P&L, the objective AS is derived for, they tie (CE difference 0.07 [−0.04, 0.18]). The gap is the liquidation cost: AS ends with 3.02 lots of inventory std against 1.27. | [report](reports/experiments/EXP-007/report.md), [pre-registration](experiments/EXP-007_skew_vs_avellaneda_stoikov.md) |
 
 Also checked, in tests rather than experiments: a Glosten–Milgrom market maker in the
 two-value world has zero mean P&L, and its first spread equals the informed share times the
 value range (`tests/test_informed_and_gm.py`).
 
-Runs and grid points tried in total: 158 at the time of writing (every line of
+Runs and grid points tried in total: 172 at the time of writing (every line of
 [experiments/trial_log.csv](experiments/trial_log.csv)).
 
 ## Limitations
@@ -75,12 +79,12 @@ Runs and grid points tried in total: 158 at the time of writing (every line of
 - **The market maker is given things it would have to estimate**: the true value as a mid
   price, and (for Avellaneda–Stoikov) the true volatility and `k`.
 - **Latency is only a requote interval**; there is no race between traders.
-- **One seed per experiment.** Grid points inside an experiment share random numbers, so they
-  are not independent. Two things this left open are recorded in the experiment files: in
-  EXP-001 every simulated std is slightly below the variance formula, and in EXP-002 every
-  cell is about two standard errors above theory.
-- **Process.** EXP-001 was approved by me. EXP-002 to EXP-005 were approved under
-  delegation during an overnight run, not by me.
+- **One seed per experiment.** Grid points inside EXP-001 to EXP-005 share random numbers, so
+  they are not independent. That left two one-sided patterns unexplained (stds below the
+  formula in EXP-001, means above theory in EXP-002); EXP-006 retested both on independent
+  seeds and found no bias.
+- **Process.** EXP-001, EXP-006 and EXP-007 were approved by me. EXP-002 to EXP-005 were
+  approved under delegation during an overnight run, not by me.
 
 ## Reproduce
 
@@ -128,8 +132,11 @@ it until it is approved and its config hash matches.
 - Fill count and spread capture are bad scorecards. Both go *up* when informed traders or
   stale quotes are the reason for the fills.
 - Most of the risk is inventory, and leaning quotes against the position removes more than
-  half of it cheaply. The model-derived strategy was not better than the simple rule once the
-  objective changed slightly.
+  half of it cheaply. The model-derived strategy (Avellaneda–Stoikov) ties with a simple skew
+  on the objective it was derived for and loses once closing the position costs something:
+  a strategy that is optimal in a model inherits the model's blind spots.
+- Results that share a seed move together. Ten ratios on the same side are one observation,
+  not ten; I only found that out by retesting on independent seeds.
 - A simulator will confirm whatever you rerun it for. Writing the prediction down first,
   checking against a closed form, and keeping a cheating strategy around to prove the tests
   can fail caught real mistakes during the build: a closed form that was wrong by 14 standard
